@@ -1,4 +1,4 @@
-# Project2
+# Shares prediction
 
 ## Purpose
 The purpose of this project is to show how you can build and use predictive models and automate Markdown reports. We used the OnlineNewsPopularity dataset
