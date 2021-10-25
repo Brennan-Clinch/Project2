@@ -9,6 +9,7 @@ to then automate the EDA (exploratory data analysis) along with predictive model
 The following packages were required in this project:
 
 `tidyverse`: an R package for data science, with tons of tools for data visualization, manipulation, and analysis
+
 `caret`: Classification and Regression Training
 
 ## Output files
