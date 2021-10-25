@@ -36,9 +36,20 @@ I am going to import the dataset using a relative path and then subset it to onl
 library(readr)
 library(dplyr)
 setwd("C:\\Users\\awarhus_piusxi\\Desktop\\ST558")
-data<-read_csv("OnlineNewsPopularity\\OnlineNewsPopularity.csv")
-data<-subset(data, data_channel_is_socmed == 1)
+data0<-read_csv("OnlineNewsPopularity\\OnlineNewsPopularity.csv")
+data0<-subset(data0, data_channel_is_socmed == 1)
 head(data)
+```
+
+# Split data into training and test set
+
+```{r}
+library(caret)
+set.seed(8758)
+trainIndex <- createDataPartition(data0$shares, 
+                                  p = 0.7, list = FALSE)
+data<- data0[trainIndex, ]
+datatest <- data0[-trainIndex, ]
 ```
 
 # EDA 
@@ -72,4 +83,18 @@ g+geom_bar(aes(fill=num_imgs),position="dodge")+labs(x="Number of Images")+theme
 
 g<-ggplot(data=data,aes(num_videos,color=num_videos))
 g+geom_bar(aes(fill=num_videos),position="dodge")+labs(x="Number of Videos")+theme(legend.title=element_blank(), axis.text.x=element_text(angle=45))+facet_wrap(~sharecategory)
+```
+
+I hypothesize that the shorter the average word length, the more popular a media item will be. So we will analyze word length next. First, let's get the mean and standard deviation of word length in all of the media items. Next, we can look at how word length differs based on share category.
+
+```{r}
+wordSumm<-data %>% 
+  summarize("Mean"=mean(average_token_length),
+            "Standard Deviation"=sd(average_token_length))
+knitr ::kable(wordSumm)
+
+wordSumm2<-data %>% group_by(sharecategory) %>%
+  summarize("Mean"=mean(average_token_length),
+            "Standard Deviation"=sd(average_token_length))
+knitr ::kable(wordSumm2)
 ```
