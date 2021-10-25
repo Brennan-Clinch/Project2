@@ -98,3 +98,10 @@ wordSumm2<-data %>% group_by(sharecategory) %>%
             "Standard Deviation"=sd(average_token_length))
 knitr ::kable(wordSumm2)
 ```
+
+Finally, we'll explore the title polarity vs. the share category.
+
+```{r}
+g<-ggplot(data=data,aes(title_sentiment_polarity,color=title_sentiment_polarity))
+g+geom_bar(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Title Polarity")+theme(legend.title=element_blank(), axis.text.x=element_text(angle=45))+scale_y_continuous(limits=c(0,35))+facet_wrap(~sharecategory)
+```
