@@ -156,5 +156,18 @@ confusionMatrix(data=datatest$shares,reference=predict(boostFit,newdata=datatest
 
 # Automation from markdown
 
+```{r}
+library(rmarkdown)
+channelID<-c("data_channel_is_lifestyle",
+             "data_channel_is_entertainment",
+             "data_channel_is_bus",
+             "data_channel_is_socmed",
+             "data_channel_is_tech",
+             "data_channel_is_world")
+output_file<-paste0(channelID,".md")
+params = lapply(channelID, FUN = function(x){list(channel = x)})
+reports<-tibble(output_file,params)
+```
+
 
 ```
