@@ -20,11 +20,11 @@ The following packages were required in this project:
 # Introduction
 
 We are going to analyze the Online News Popularity dataset. It is a dataset which is used to predict the number of shares and article published on Mashable.com got on social media sites.We are going to use the following variables to predict Number of Shares.
-*num_imgs: Number of images
-*num_videos: Number of videos
-* average_token_length: Average length of the words in the content
-*weekday_is_ __: indicator that tells which day of the week the article was published on and
-*title_sentiment_polarity: Title polarity
+We are going to analyze the Online News Popularity dataset. It is a dataset which is used to predict the number of shares and article published on Mashable.com got on social media sites.We are going to use the following variables to predict Number of Shares.
+*num_imgs: Number of images  
+*num_videos: Number of videos  
+*average_token_length: Average length of the words in the content and  
+*title_sentiment_polarity: Title polarity  
 
 To predict the Number of Shares, we will use linear regression and ensemble based tree methods, including random forest and boosted trees.
 
