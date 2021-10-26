@@ -18,10 +18,6 @@ The following packages were required in this project:
 
 `ggplot2`: A package to build graphs/visuals with
 
-## Output files
-
-## Automation from markdown
-
 
 # Introduction
 
@@ -157,4 +153,8 @@ boostFit <- train(shares~num_imgs
                               interaction.depth = c(1:4),
                               n.minobsinnode = 10))
 confusionMatrix(data=datatest$shares,reference=predict(boostFit,newdata=datatest$shares))
+
+# Automation from markdown
+
+
 ```
