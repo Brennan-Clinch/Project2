@@ -105,3 +105,27 @@ Finally, we'll explore the title polarity vs. the share category.
 g<-ggplot(data=data,aes(title_sentiment_polarity,color=title_sentiment_polarity))
 g+geom_bar(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Title Polarity")+theme(legend.title=element_blank(), axis.text.x=element_text(angle=45))+scale_y_continuous(limits=c(0,35))+facet_wrap(~sharecategory)
 ```
+
+# Ensemble Methods
+
+## Boosted Tree Model
+
+Boosting is a process where models are trained sequentially. The focus is put on situations where the model fails to predict correctly a statistically significant amount of the time. These models are given more weight so that they are more likely to appear in any given sample. Therefore, the tree will focus on getting these correct and therefore improve the overall prediction. As this process continues, the model gets stronger and stronger.Boosting is particularly robust against overfitting.
+
+Here I will do boosting with 5 fold repeated cross validation (3 times). I will then print the confusion matrix on the test set.
+
+```{r}
+ctrl <- trainControl(method="repeatedcv",number=5, repeats = 3)
+boostFit <- train(shares~num_imgs
+                  +num_videos
+                  +average_token_length
+                  +title_sentiment_polarity
+                  ,data = data, 
+                method = "gbm", trControl = ctrl, 
+                preProcess = c("center","scale"), 
+                tuneGrid =  expand.grid(n.trees = 25, 
+                              shrinkage = 0.1,
+                              interaction.depth = c(1:4),
+                              n.minobsinnode = 10))
+confusionMatrix(data=datatest$shares,reference=predict(boostFit,newdata=datatest$shares))
+```
