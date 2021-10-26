@@ -106,6 +106,29 @@ g<-ggplot(data=data,aes(title_sentiment_polarity,color=title_sentiment_polarity)
 g+geom_bar(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Title Polarity")+theme(legend.title=element_blank(), axis.text.x=element_text(angle=45))+scale_y_continuous(limits=c(0,35))+facet_wrap(~sharecategory)
 ```
 
+# Linear Regression
+
+I will analyze a model that includes all terms and all possible interactions. I will analyze this model using 10 fold cross validation.
+
+```{r}
+fit1<-lm(shares~num_imgs
+                  *num_videos
+                  *average_token_length
+                  *title_sentiment_polarity
+                  ,data = data)
+summary(fit1)
+train1<-train(shares~num_imgs
+                  *num_videos
+                  *average_token_length
+                  *title_sentiment_polarity,
+              data=data,
+              method="lm",
+              preProcess=c("center","scale"),
+              trControl=trainControl(method="cv",number=10))
+train1$results
+```
+
+
 # Ensemble Methods
 
 ## Boosted Tree Model
