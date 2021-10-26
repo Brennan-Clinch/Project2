@@ -12,6 +12,12 @@ The following packages were required in this project:
 
 `caret`: Classification and Regression Training
 
+`dplyr`: A tool for working with dataframes
+
+`readr`: A tool to read in the file
+
+`ggplot2`: A package to build graphs/visuals with
+
 ## Output files
 
 ## Automation from markdown
