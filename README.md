@@ -157,6 +157,7 @@ confusionMatrix(data=datatest$shares,reference=predict(boostFit,newdata=datatest
 # Automation from markdown
 
 ```{r}
+library(tidyverse)
 library(rmarkdown)
 channelID<-c("data_channel_is_lifestyle",
              "data_channel_is_entertainment",
@@ -167,6 +168,10 @@ channelID<-c("data_channel_is_lifestyle",
 output_file<-paste0(channelID,".md")
 params = lapply(channelID, FUN = function(x){list(channel = x)})
 reports<-tibble(output_file,params)
+apply(reports, MARGIN = 1, 
+            FUN = function(x){
+                render(input = "C:\\Users\\awarhus_piusxi\\Desktop\\ST558\\Project2\\Project2.rmd", output_file = x[[1]], params = x[[2]])
+                })
 ```
 
 
