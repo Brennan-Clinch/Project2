@@ -80,11 +80,23 @@ data<- data %>%
   mutate(sharecategory = ifelse(shares <1400, "few",
                       ifelse(shares <=3800, "some",
                              "many")))
-g<-ggplot(data=data,aes(num_imgs,color=num_imgs))
-g+geom_bar(aes(fill=num_imgs),position="dodge")+labs(x="Number of Images")+theme(legend.title=element_blank(), axis.text.x=element_text(angle=45))+facet_wrap(~sharecategory)
+g<-ggplot(data=data,aes(x=num_imgs,fill=sharecategory))
+g+geom_bar(position="dodge")+
+  labs(x="Number of Images")+
+  theme(legend.title=element_blank(),
+        axis.text.x=element_text(angle=45))+
+  facet_wrap(~sharecategory)+
+  theme(legend.position = "None")
 
-g<-ggplot(data=data,aes(num_videos,color=num_videos))
-g+geom_bar(aes(fill=num_videos),position="dodge")+labs(x="Number of Videos")+theme(legend.title=element_blank(), axis.text.x=element_text(angle=45))+facet_wrap(~sharecategory)
+g<-ggplot(data=data,aes(x=num_videos, fill=sharecategory))
+g+geom_bar(position="dodge")+
+  labs(x="Number of Videos")+
+  theme(legend.title=element_blank(),
+        axis.text.x=element_text(angle=45))+
+  facet_wrap(~sharecategory)+
+  theme(legend.position = "None")
+```
+We can inspect the trend of number of images and videos and how it affects number of shares. If the tallest and most concentrated chunk of bars is in a different spot for each share category, then we can conclude that the number of images videos (depending on the graph you are looking at) is related to the number of shares. If each of the three graphs looks the same, then we would conclude that images and videos do not necessarily impact the number of shares. 
 ```
 
 I hypothesize that the shorter the average word length, the more popular a media item will be. So we will analyze word length next. First, let's get the mean and standard deviation of word length in all of the media items. Next, we can look at how word length differs based on share category.
