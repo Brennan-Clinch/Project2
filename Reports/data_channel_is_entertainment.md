@@ -1,4 +1,7 @@
+
 entertainment analysis
+=======
+Entertainment
 ================
 Brennan Clinch
 10/25/2021
