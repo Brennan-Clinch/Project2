@@ -52,16 +52,19 @@ knitr ::kable(sharesSumm)
 
 
 Based on this information, I will categorize the numbers of shares in the following way:
-*Less that 1400 shares is "few"
-*Between 1400 and 3800 shares is "some"
-*More than 3800 is "many"
+*Less than the first quartile shares is "few"
+*Between the first and third quartile shares is "some"
+*More than the third quartile is "many"
 I will add a categorical variable to the data to reflect this categorization and use it to visualize the number of images and then videos in media.
 
 ```{r}
 library(ggplot2)
 data<- data %>% 
-  mutate(sharecategory = ifelse(shares <1400, "few",
-                      ifelse(shares <=3800, "some",
+  mutate(sharecategory = ifelse(
+    shares <quantile(shares,0.25), "few",
+                      ifelse(
+                        shares<=
+                          quantile(shares,0.75),"some",
                              "many")))
 g<-ggplot(data=data,aes(x=num_imgs,fill=sharecategory))
 g+geom_bar(position="dodge")+
@@ -96,13 +99,24 @@ wordSumm2<-data %>% group_by(sharecategory) %>%
 knitr ::kable(wordSumm2)
 ```
 
+What we are looking for here is if the mean and standard deviation based on share category is substantially different from category to category or from the overall mean and standard deviation.
 
 Finally, we'll explore the title polarity vs. the share category.
 
 ```{r}
-g<-ggplot(data=data,aes(title_sentiment_polarity,color=title_sentiment_polarity))
-g+geom_bar(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Title Polarity")+theme(legend.title=element_blank(), axis.text.x=element_text(angle=45))+scale_y_continuous(limits=c(0,35))+facet_wrap(~sharecategory)
+g<-ggplot(data=data,
+          aes(x=title_sentiment_polarity,
+              fill=sharecategory))
+g+geom_bar(position="dodge")+
+  labs(x="Title Polarity")+
+  theme(legend.title=element_blank(),
+        axis.text.x=element_text(angle=45))+
+  scale_y_continuous(limits=c(0,35))+
+  facet_wrap(~sharecategory)+
+  theme(legend.position = "None")
 ```
+This variable is a measure of how polarizing the title is. Bars further to the right on each graph indicate that the title is more polarizing. We are looking for a difference in where the bars fall in each graph to determine if title polarity has an effect on number of shares.
+
 # Linear Regression
 
 I will analyze a model that includes all terms and all possible interactions. I will analyze this model using 10 fold cross validation.
