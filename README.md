@@ -18,6 +18,8 @@ The following packages were required in this project:
 
 `ggplot2`: A package to build graphs/visuals with
 
+## Output Files
+
 
 # Introduction
 
