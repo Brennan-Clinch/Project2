@@ -1,6 +1,4 @@
 
-entertainment analysis
-=======
 Entertainment
 ================
 Brennan Clinch
