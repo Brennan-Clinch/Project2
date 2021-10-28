@@ -108,7 +108,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](data_channel_is_lifestyle_files/figure-gfm/unnamed-chunk-9-1.png)
+![]("Reports/unnamed-chunk-9-1.png")
 
 ``` r
 g<-ggplot(data=data,aes(x=num_videos, fill=sharecategory))
