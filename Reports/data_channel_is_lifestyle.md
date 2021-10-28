@@ -1,4 +1,4 @@
-Project 2
+Lifestyle
 ================
 Brennan Clinch
 10/22/2021
@@ -27,12 +27,12 @@ and
 To predict the Number of Shares, we will use linear regression and
 ensemble based tree methods, including random forest and boosted trees.
 
-The data channel we will be analyzing is the socmed channel.
+The data channel we will be analyzing is the lifestyle channel.
 
 # Import and Subset data
 
 I am going to import the dataset using a relative path and then subset
-it to only include data from the social media channel.
+it to only include data from the lifestyle channel.
 
 ``` r
 library(readr)
