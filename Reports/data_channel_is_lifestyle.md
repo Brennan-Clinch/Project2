@@ -121,6 +121,7 @@ g+geom_bar(position="dodge")+
 ```
 
 ![](data_channel_is_lifestyle_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
+
 We can inspect the trend of number of images and videos and how it
 affects number of shares. If the tallest and most concentrated chunk of
 bars is in a different spot for each share category, then we can
