@@ -24,6 +24,7 @@ The following packages were required in this project:
 - The analysis for [lifestyle is available here](Reports/data_channel_is_lifestyle.md)
 - The analysis for [business is available here](Reports/data_channel_is_bus.md)
 - The analysis for [world is available here](Reports/data_channel_is_world.md)
+- The analysis for [technology is available here](Reports/data_channel_is_tech.md)
 
 ```{r}
 wordSumm<-data %>% 
