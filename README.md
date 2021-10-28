@@ -20,6 +20,7 @@ The following packages were required in this project:
 
 ## Output Files
 - The analysis for [social media is available here](Reports/data_channel_is_socmed.md)
+- The analysis for [entertainment is available here](Reports/data_channel_is_entertainment.md)
 
 # Introduction
 
