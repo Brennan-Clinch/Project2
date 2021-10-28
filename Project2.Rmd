@@ -145,9 +145,10 @@ boostFit <- train(shares~num_imgs
                 tuneGrid =  expand.grid(n.trees = c(25,100), 
                               shrinkage = c(0.01,0.1),
                               interaction.depth = c(1:4),
-                              n.minobsinnode = c(3,10)))
+                              n.minobsinnode = c(3,10)),
+                verbose = FALSE)
 ```
-postResample(pred=datatest$shares,obs=predict(boostFit,newdata=datatest$shares))
+
 
 
 #Automation
@@ -167,10 +168,7 @@ reports<-tibble(output_file,params)
 apply(reports, MARGIN = 1, 
             FUN = function(x){
                 render(input = "C:\\Users\\awarhus_piusxi\\Desktop\\ST558\\Project2\\Project2.rmd", output_file = x[[1]], params = x[[2]])
-                }
-      output_options = list(toc = TRUE, 
-                            toc_depth = '2', toc_float=TRUE))
+                })
 ```
 
-Trying a random change
 
