@@ -21,7 +21,7 @@ The following packages were required in this project:
 ## Output Files
 - The analysis for [social media is available here](Reports/data_channel_is_socmed.md)
 - The analysis for [entertainment is available here](Reports/data_channel_is_entertainment.md)
-
+- The analysis for [lifestyle is available here](Reports/data_channel_is_lifestyle.md)
 # Introduction
 
 We are going to analyze the Online News Popularity dataset. It is a dataset which is used to predict the number of shares and article published on Mashable.com got on social media sites.We are going to use the following variables to predict Number of Shares.
