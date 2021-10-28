@@ -19,7 +19,7 @@ The following packages were required in this project:
 `ggplot2`: A package to build graphs/visuals with
 
 ## Output Files
-
+- The analysis for [lifestyle is available here](Reports/data_channel_is_lifestyle.md)
 
 # Introduction
 
