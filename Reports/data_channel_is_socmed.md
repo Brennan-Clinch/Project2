@@ -1,4 +1,4 @@
-Project 2
+Social Media
 ================
 Brennan Clinch
 10/22/2021
@@ -26,6 +26,8 @@ and
 
 To predict the Number of Shares, we will use linear regression and
 ensemble based tree methods, including random forest and boosted trees.
+
+The data channel we are using here is social media
 
 # Import and Subset data
 
