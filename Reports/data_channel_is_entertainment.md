@@ -1,7 +1,7 @@
-Project 2
+entertainment analysis
 ================
 Brennan Clinch
-10/22/2021
+10/25/2021
 
 -   [Introduction](#introduction)
 -   [Import and Subset data](#import-and-subset-data)
@@ -27,12 +27,12 @@ and
 To predict the Number of Shares, we will use linear regression and
 ensemble based tree methods, including random forest and boosted trees.
 
-The data channel we will be analyzing is the socmed channel.
+The data channel we will be analyzing is the entertainment channel.
 
 # Import and Subset data
 
 I am going to import the dataset using a relative path and then subset
-it to only include data from the social media channel.
+it to only include data from the entertainment channel.
 
 ``` r
 library(readr)
@@ -52,7 +52,7 @@ data0<-read_csv("OnlineNewsPopularity.csv")
     ## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 ``` r
-data0<-subset(data0, data_channel_is_socmed == 1)
+data0<-subset(data0, data_channel_is_entertainment == 1)
 head(data)
 ```
 
@@ -87,7 +87,7 @@ knitr ::kable(sharesSumm)
 
 | Min | 1st Quartile | Median | 3rd Quartile |    Max |
 |----:|-------------:|-------:|-------------:|-------:|
-|   5 |         1400 |   2100 |         3800 | 122800 |
+|  47 |          833 |   1200 |         2100 | 197600 |
 
 Based on this information, I will categorize the numbers of shares in
 the following way: *Less that 1400 shares is “few” *Between 1400 and
