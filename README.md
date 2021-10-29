@@ -24,6 +24,7 @@ The following packages were required in this project:
 - The analysis for [lifestyle is available here](Reports/data_channel_is_lifestyle.md)
 - The analysis for [business is available here](Reports/data_channel_is_bus.md)
 - The analysis for [world is available here](Reports/data_channel_is_world.md)
+- The analysis for [technology is available here](Reports/data_channel_is_tech.md)
 
 ```{r}
 wordSumm<-data %>% 
@@ -89,26 +90,31 @@ boostFit <- train(shares~num_imgs
                               interaction.depth = c(1:4),
                               n.minobsinnode = 10))
 confusionMatrix(data=datatest$shares,reference=predict(boostFit,newdata=datatest$shares))
+```
+## Automation from Markdown
 
-# Automation from markdown
+```{r,eval = FALSE}
 
-```{r}
 library(tidyverse)
 library(rmarkdown)
-channelID<-c("data_channel_is_lifestyle",
+channelID<-list("data_channel_is_lifestyle",
              "data_channel_is_entertainment",
              "data_channel_is_bus",
              "data_channel_is_socmed",
              "data_channel_is_tech",
              "data_channel_is_world")
-output_file<-paste0(channelID,".md")
-params = lapply(channelID, FUN = function(x){list(channel = x)})
-reports<-tibble(output_file,params)
-apply(reports, MARGIN = 1, 
-            FUN = function(x){
-                render(input = "C:\\Users\\awarhus_piusxi\\Desktop\\ST558\\Project2\\Project2.rmd", output_file = x[[1]], params = x[[2]])
-                })
+
+for (channel in c(0,1,2,3,4,5,6)){
+  rmarkdown::render(
+    "Project_2.Rmd",
+    output_file=paste0( channelID[[channel+1]]),
+    params = list(
+    channel = channel,
+    name = channelID[[channel+1]]
+    )
+  )
+}
 ```
 
 
-```
+
