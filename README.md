@@ -90,8 +90,8 @@ boostFit <- train(shares~num_imgs
                               interaction.depth = c(1:4),
                               n.minobsinnode = 10))
 confusionMatrix(data=datatest$shares,reference=predict(boostFit,newdata=datatest$shares))
-
-# Automation from markdown
+```
+## Automation from Markdown
 
 ```{r,eval = FALSE}
 
@@ -117,4 +117,4 @@ for (channel in c(0,1,2,3,4,5,6)){
 ```
 
 
-```
+
