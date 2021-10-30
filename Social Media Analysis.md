@@ -163,7 +163,7 @@ knitr ::kable(wordSumm, caption = "Mean and Standard deviation of average word l
 
 Mean and Standard deviation of average word length
 
-From the summary, it appears the mean of average word length for the Lifestyle channel was 4.63 and the standard deviation was 0.43.
+From the summary, it appears the mean of average word length for the Social Media channel was 4.63 and the standard deviation was 0.43.
 
 ``` r
 wordSumm2<-trainData %>% group_by(sharecategory) %>%
