@@ -1,4 +1,4 @@
-Project02
+Business Analysis
 ================
 Brennan Clinch
 10/29/2021
@@ -31,15 +31,12 @@ ensemble based tree methods, including random forest and boosted trees.
 
 # Import and Subset data
 
+
 ``` r
 library(tidyverse)
 library(caret)
 ## Read in Raw Data Using Relative Path
 Data <- read_csv("OnlineNewsPopularity.csv") 
-```
-
-``` r
-library(caret)
 ## Create a New Variable to Data Channel to use when automating.
 automationdata <- Data %>% mutate(data_channel =   if_else(data_channel_is_lifestyle == 1, "Lifestyle Analysis",
        if_else(data_channel_is_entertainment == 1, "Entertainment Analysis",
@@ -48,16 +45,20 @@ automationdata <- Data %>% mutate(data_channel =   if_else(data_channel_is_lifes
                               if_else(data_channel_is_tech == 1, "Tech Analysis", "World Analysis"))))))
 ## Subset Data for Respective Data Channel
 subsetted_data <- automationdata %>% filter(data_channel == params$data_channel)
+```
+Let's now split up our subsetted data sets to training and testing (70/30)
+``` r
 ## Create Training and Test Data Sets
-set.seed(500)
+set.seed(50)
 trainIndex <- createDataPartition(subsetted_data$shares, p = 0.7, list = FALSE)
 trainData <- subsetted_data[trainIndex,]
 testData <- subsetted_data[-trainIndex,]
-trainData
 ```
 
 ## Exploratory Data Analysis (EDA)
+Now that we have our data split up, we are ready to do exploratory data analysis on all the variables we will be using in our predictive models.
 
+Let us first take a look at shares. We created a new variable sharesSumm that provides a 5-number summary of shares for the Business channel.
 ``` r
 sharesSumm<-trainData %>% 
   summarize("Min"=min(shares),
@@ -74,6 +75,8 @@ knitr ::kable(sharesSumm, caption = "5-number summary for number of shares")
 |   1 |       952.25 |   1400 |         2500 | 652900 |
 
 5-number summary for number of shares
+
+Based on the 5-number summary, it does appear our data might be skewed since the Max is way off from the Min, Q1,Median, and Q3. So our median tells us a better estimate on our average number of shares here.
 
 Let’s start by creating a new factor variable for the training set which
 categorizes shares based on the number of them.
@@ -100,8 +103,10 @@ knitr::kable(table(trainData$sharecategory), caption = paste0("contingency table
 
 contingency table for sharecategory
 
-Let’s now create bar plots of the number of images based on the new
-variable which is the category of shares based on the number of them.
+From the table, it appears that for the Business channel, most shares were less than 1400 and the least were greater than 3800.
+
+Let’s now create bar plots of the number of images based on the new variable which is the category of shares based on the number of them.
+
 
 ``` r
 g<-ggplot(data=trainData,aes(x=num_imgs,fill=sharecategory))
@@ -115,6 +120,8 @@ g+geom_bar(position="dodge")+
 
 ![](BUSINE~2/unnamed-chunk-6-1.png)<!-- -->
 
+Looking at the plots, it appears our data is extremely skewed with most of the number of images being around zero especially when share category was equal to 'few', so while most images were not a lot and were mostly zero, the less the shares the fewer the number of images for each article in the Business channel.
+
 ``` r
 g<-ggplot(data=trainData,aes(x=num_videos, fill=sharecategory))
 g+geom_bar(position="dodge")+
@@ -127,7 +134,9 @@ g+geom_bar(position="dodge")+
 
 ![](BUSINE~2/unnamed-chunk-7-1.png)<!-- -->
 
-We can inspect the trend of number of images and videos and how it
+Looking at the plots again, it appears once again that our data is extremely skewed with most of the number of videos being around zero mainly when share were less than 1400, but this time the number of videos with shares from 1400 to 3800 was around zero. So we can somewhat say that the number of shares has an effect on the number of videos.
+
+From the two bar graphs, we can inspect the trend of number of images and videos and how it
 affects number of shares. If the tallest and most concentrated chunk of
 bars is in a different spot for each share category, then we can
 conclude that the number of images videos (depending on the graph you
@@ -135,7 +144,7 @@ are looking at) is related to the number of shares. If each of the three
 graphs looks the same, then we would conclude that images and videos do
 not necessarily impact the number of shares.
 
-I hypothesize that the shorter the average word length, the more popular
+We next will hypothesize that the shorter the average word length, the more popular
 a media item will be. So we will analyze word length next. First, let’s
 get the mean and standard deviation of word length in all of the media
 items. Next, we can look at how word length differs based on share
@@ -154,6 +163,8 @@ knitr ::kable(wordSumm, caption = "Mean and Standard deviation of average word l
 
 Mean and Standard deviation of average word length
 
+From the summary, it appears the mean of average word length for the World channel was 4.69 and the standard deviation was 0.42.
+
 ``` r
 wordSumm2<-trainData %>% group_by(sharecategory) %>%
   summarize("Mean"=mean(average_token_length),
@@ -169,6 +180,8 @@ knitr ::kable(wordSumm2, caption = "Mean and Standard deviation of average word 
 
 Mean and Standard deviation of average word length by share category
 
+Looking at the summary statistics, the share category that got the lowest mean was 'many', the highest mean was 'few', the lowest standard deviation was 'few', and the highest standard deviation was 'many'.
+
 This can better be summarized with the boxplots below
 
 ``` r
@@ -179,7 +192,9 @@ g1+geom_boxplot()+
 
 ![](BUSINE~2/unnamed-chunk-10-1.png)<!-- -->
 
-Finally, we’ll explore the title polarity vs. the share category.
+From the boxplots, it does appear that each boxplot is a little bit symmetrical in distribution by looking at the box part with q1, median, and q3, but it does appear that it may be a bit skewed since we have many outlying values. We can also clearly see that few had the biggest average word length since it has the highest mean and maximum.
+
+Finally, we’ll explore the title polarity vs. the share category from histograms.
 
 ``` r
 g<-ggplot(data=trainData,aes(title_sentiment_polarity,color=title_sentiment_polarity))
@@ -193,7 +208,13 @@ g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Ti
 
 ![](BUSINE~2/unnamed-chunk-11-1.png)<!-- -->
 
+Based on the histograms, it does look like the histograms are a little symmetric (not exactly a normal distribution though) with most values of Title Polarity being close to zero with share category 'many' having an extremely high amount. So articles with title polarity close to zero and with shares greater than 3800 will most likely be shared more often.
+
+
+
 # Model fitting
+
+Now that we have done basic EDA on our data and variables we are analyzing, we are ready to start doing our predictive modeling.
 
 ## Linear Models
 
@@ -222,6 +243,7 @@ train1<-train(shares~num_imgs
               preProcess=c("center","scale"),
               trControl=trainControl(method="cv",number=10))
 ```
+(shares~num_imgs*num_videos*average_token_length*title_sentiment_polarity)
 
 ### Model 2: Poisson Regression model (GLM)
 
