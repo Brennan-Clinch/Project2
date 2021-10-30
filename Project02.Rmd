@@ -1,11 +1,12 @@
 ---
 title: "Project02"
-author: "Brennan Clinch, Allison Warhus"
+author: "Brennan Clinch"
 date: "10/29/2021"
 output: github_document
 params:
   data_channel: "params$data_channel"
 ---
+`r params$data_channel`
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -40,11 +41,11 @@ ensemble based tree methods, including random forest and boosted trees.
 
 
 ```{r,eval = F, echo = FALSE}
-channelIDs <- unique(rawDataNew$data_channel)
+channelID <- unique(automationdata$data_channel)
 
-output_file <- paste0(channelIDs, ".md")
+output_file <- paste0(channelID, ".md")
 
-params = lapply(channelIDs, FUN = function(x){list(data_channel = x)})
+params = lapply(channelID, FUN = function(x){list(data_channel = x)})
 
 reports <- tibble(output_file, params)
 
@@ -55,10 +56,11 @@ apply(reports, MARGIN = 1,
                 })
 ```
 
-```{r, message = F}
+```{r, message = F,warning=F}
 library(tidyverse)
+library(caret)
 ## Read in Raw Data Using Relative Path
-rawData <- read_csv("OnlineNewsPopularity.csv") 
+Data <- read_csv("OnlineNewsPopularity.csv") 
 ```
 
    
@@ -66,18 +68,18 @@ rawData <- read_csv("OnlineNewsPopularity.csv")
 ```{r}
 library(caret)
 ## Create a New Variable to Data Channel to use when automating.
-rawDataNew <- rawData %>% mutate(data_channel =   if_else(data_channel_is_bus == 1, "Business Analysis",
+automationdata <- Data %>% mutate(data_channel =   if_else(data_channel_is_lifestyle == 1, "Lifestyle Analysis",
        if_else(data_channel_is_entertainment == 1, "Entertainment Analysis",
-               if_else(data_channel_is_lifestyle == 1, "Lifestyle Analysis",
+               if_else(data_channel_is_bus == 1, "Business Analysis",
                       if_else(data_channel_is_socmed == 1, "Social Media Analysis",
                               if_else(data_channel_is_tech == 1, "Tech Analysis", "World Analysis"))))))
 ## Subset Data for Respective Data Channel
-subsetData <- rawDataNew %>% filter(data_channel == params$data_channel)
+subsetted_data <- automationdata %>% filter(data_channel == params$data_channel)
 ## Create Training and Test Data Sets
 set.seed(500)
-trainIndex <- createDataPartition(subsetData$shares, p = 0.7, list = FALSE)
-trainData <- subsetData[trainIndex,]
-testData <- subsetData[-trainIndex,]
+trainIndex <- createDataPartition(subsetted_data$shares, p = 0.7, list = FALSE)
+trainData <- subsetted_data[trainIndex,]
+testData <- subsetted_data[-trainIndex,]
 trainData
 ```
 
@@ -86,19 +88,6 @@ trainData
 
 ## Exploratory Data Analysis (EDA)
 
-
-
-```{r}
-#Create New variable using weekday_is_() variables
-trainDataNew <- trainData %>% mutate(day_of_the_week =   if_else(weekday_is_monday == 1, "Monday",
-       if_else(weekday_is_tuesday == 1, "Tuesday",
-               if_else(weekday_is_wednesday == 1, "Wednesday",
-                      if_else(weekday_is_thursday == 1, "Thursday",
-                              if_else(weekday_is_friday == 1, "Friday",
-                                      if_else(weekday_is_saturday == 1, "Saturday", "Sunday"
-                                              ))))))) 
-trainDataNew
-```
 
     
 
@@ -110,7 +99,7 @@ sharesSumm<-trainData %>%
             "3rd Quartile"=quantile(shares,0.75),
             "Max"=max(shares)
             )
-knitr ::kable(sharesSumm)
+knitr ::kable(sharesSumm, caption = "5-number summary for number of shares")
 ```
 
 Let's start by creating a new factor variable for the training set which categorizes shares based on the number of them. 
@@ -188,6 +177,13 @@ wordSumm2<-trainData %>% group_by(sharecategory) %>%
 knitr ::kable(wordSumm2, caption = "Mean and Standard deviation of average word length by share category")
 ```
 
+This can better be summarized with the boxplots below
+
+```{r}
+g1 <- ggplot(data = trainData, aes(x=sharecategory, y = average_token_length, color = sharecategory))
+g1+geom_boxplot()+
+  labs(title = "boxplots of average word length based on shares category", x = "shares category", y = "average word length")
+```
 
 
 Finally, we’ll explore the title polarity vs. the share category.
@@ -319,13 +315,49 @@ Let’s evaluate their repeated k-folds CV performance first
 So we first set up a list and vectors of our models to store in a table/data frame for later when looking at our top candidate
 
 ```{r}
-modelList <- list(train1, train2, fitrf, boostFit)
 model_Name <- c("OLS", "Poisson Regression", "Random Forest", "Boosted tree")
+
+train1$results
+train2$results
+fitrf$results
+boostFit$results
 ```
 
 
-Now let's set up our model comparison functions that automate the process.
+
+
+
 ```{r}
+pred1 <- predict(train1, newdata = testData)
+OLS <- postResample(pred1, obs = testData$shares)
+pred2 <- predict(train2,newdata = testData)
+Poisson <- postResample(pred2,testData$shares)
+pred3 <- predict(fitrf, newdata = testData)
+Random_Forest <- postResample(pred3, testData$shares)
+pred4 <- predict(boostFit, newdata = testData)
+Boosted_Tree <- postResample(pred4,testData$shares)
+
+resultsdf <- data.frame(OLS,Poisson,Random_Forest,Boosted_Tree)
+resultsdf
+colnames(resultsdf)= model_Name
+results <- as.data.frame(t(resultsdf))
+FinalModel <- results %>% mutate(Model= model_Name) %>% filter(RMSE ==min(RMSE))%>% select(Model,RMSE)
+
+
+BestModel <- FinalModel$Model
+BestModelRMSE <- FinalModel$RMSE
+knitr::kable(
+  results,
+  digits=3,
+  caption="Testing Set Performance Summary",)
+```
+
+
+The best performing model on the testing set is the `r BestModel` with
+an RMSE of `r BestModelRMSE`.
+
+
+```{r, echo = F, eval = F}
 RMSEcv <- unlist(
   sapply(
     sapply(
@@ -361,7 +393,7 @@ cvPerformance <- data.frame(
   MAE=MAEcv
 )
 
-# Extract the best model's name and RMSE.
+
 bestModelCV <- cvPerformance %>%
   mutate(Model = model_Name) %>%
   filter(RMSE == min(RMSE)) %>%
@@ -380,15 +412,8 @@ knitr::kable(
 ```
 
 
-The best performing model in repeated k-folds CV is the `r bestModelName` with an RMSE
-of `r bestRMSE` for the training set.
 
-Usually, we would pick the best performing model here to
-test on the testing data, but we will compare them all this time.
-
-Now let’s look at their test set performance.
-
-```{r}
+```{r, eval = F}
 evaluatePeformance <- function(model, dataEval, target){
   ###
   # This function takes in a fit model, testing data (tibble), and a target
@@ -421,7 +446,3 @@ knitr::kable(
 ```
 
 
-
-
-The best performing model on the testing set is the `r bestModelName` with
-an RMSE of `r bestRMSE`.
