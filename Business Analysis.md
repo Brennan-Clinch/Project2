@@ -120,7 +120,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](Business Analysis_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](data_channel_is_bus_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 g<-ggplot(data=trainData,aes(x=num_videos, fill=sharecategory))
