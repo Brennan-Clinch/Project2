@@ -1,4 +1,4 @@
-Lifestyle Analysis analysis
+Untitled
 ================
 Brennan Clinch
 10/29/2021
@@ -12,11 +12,17 @@ the following variables to predict Number of Shares. We are going to
 analyze the Online News Popularity dataset. It is a dataset which is
 used to predict the number of shares and article published on
 Mashable.com got on social media sites.We are going to use the following
-variables to predict Number of Shares. *num\_imgs: Number of images  
-*num\_videos: Number of videos  
-*average\_token\_length: Average length of the words in the content
-and  
-*title\_sentiment\_polarity: Title polarity
+variables to predict Number of Shares.
+
+\*num\_imgs: Number of images
+
+\*num\_videos: Number of videos
+
+\*average\_token\_length: Average length of the words in the content
+
+and
+
+\*title\_sentiment\_polarity: Title polarity
 
 To predict the Number of Shares, we will use linear regression and
 ensemble based tree methods, including random forest and boosted trees.
@@ -24,49 +30,13 @@ ensemble based tree methods, including random forest and boosted trees.
 # Import and Subset data
 
 ``` r
-channelIDs <- unique(rawDataNew$data_channel)
-
-output_file <- paste0(channelIDs, ".md")
-
-params = lapply(channelIDs, FUN = function(x){list(data_channel = x)})
-
-reports <- tibble(output_file, params)
-
-library(rmarkdown)
-apply(reports, MARGIN = 1, 
-            FUN = function(x){
-                render(input = "Project2.Rmd", output_file = x[[1]], params = x[[2]])
-                })
-```
-
-``` r
+library(tidyverse)
 ## Read in Raw Data Using Relative Path
 rawData <- read_csv("OnlineNewsPopularity.csv") 
-rawData
 ```
 
-    ## # A tibble: 39,644 x 61
-    ##    url             timedelta n_tokens_title n_tokens_content n_unique_tokens
-    ##    <chr>               <dbl>          <dbl>            <dbl>           <dbl>
-    ##  1 http://mashabl~       731             12              219           0.664
-    ##  2 http://mashabl~       731              9              255           0.605
-    ##  3 http://mashabl~       731              9              211           0.575
-    ##  4 http://mashabl~       731              9              531           0.504
-    ##  5 http://mashabl~       731             13             1072           0.416
-    ##  6 http://mashabl~       731             10              370           0.560
-    ##  7 http://mashabl~       731              8              960           0.418
-    ##  8 http://mashabl~       731             12              989           0.434
-    ##  9 http://mashabl~       731             11               97           0.670
-    ## 10 http://mashabl~       731             10              231           0.636
-    ## # ... with 39,634 more rows, and 56 more variables: n_non_stop_words <dbl>,
-    ## #   n_non_stop_unique_tokens <dbl>, num_hrefs <dbl>, num_self_hrefs <dbl>,
-    ## #   num_imgs <dbl>, num_videos <dbl>, average_token_length <dbl>,
-    ## #   num_keywords <dbl>, data_channel_is_lifestyle <dbl>,
-    ## #   data_channel_is_entertainment <dbl>, data_channel_is_bus <dbl>,
-    ## #   data_channel_is_socmed <dbl>, data_channel_is_tech <dbl>,
-    ## #   data_channel_is_world <dbl>, kw_min_min <dbl>, kw_max_min <dbl>, ...
-
 ``` r
+library(caret)
 ## Create a New Variable to Data Channel to use when automating.
 rawDataNew <- rawData %>% mutate(data_channel =   if_else(data_channel_is_bus == 1, "Business Analysis",
        if_else(data_channel_is_entertainment == 1, "Entertainment Analysis",
@@ -83,57 +53,7 @@ testData <- subsetData[-trainIndex,]
 trainData
 ```
 
-    ## # A tibble: 1,472 x 62
-    ##    url             timedelta n_tokens_title n_tokens_content n_unique_tokens
-    ##    <chr>               <dbl>          <dbl>            <dbl>           <dbl>
-    ##  1 http://mashabl~       731             11              103           0.689
-    ##  2 http://mashabl~       731             10              243           0.619
-    ##  3 http://mashabl~       731              8              204           0.586
-    ##  4 http://mashabl~       730             12              499           0.513
-    ##  5 http://mashabl~       729             11              223           0.662
-    ##  6 http://mashabl~       729             11             1099           0.412
-    ##  7 http://mashabl~       729             14              318           0.633
-    ##  8 http://mashabl~       729              7              144           0.723
-    ##  9 http://mashabl~       729             11             1058           0.410
-    ## 10 http://mashabl~       729              8              211           0.608
-    ## # ... with 1,462 more rows, and 57 more variables: n_non_stop_words <dbl>,
-    ## #   n_non_stop_unique_tokens <dbl>, num_hrefs <dbl>, num_self_hrefs <dbl>,
-    ## #   num_imgs <dbl>, num_videos <dbl>, average_token_length <dbl>,
-    ## #   num_keywords <dbl>, data_channel_is_lifestyle <dbl>,
-    ## #   data_channel_is_entertainment <dbl>, data_channel_is_bus <dbl>,
-    ## #   data_channel_is_socmed <dbl>, data_channel_is_tech <dbl>,
-    ## #   data_channel_is_world <dbl>, kw_min_min <dbl>, kw_max_min <dbl>, ...
-
-``` r
-testData
-```
-
-    ## # A tibble: 627 x 62
-    ##    url             timedelta n_tokens_title n_tokens_content n_unique_tokens
-    ##    <chr>               <dbl>          <dbl>            <dbl>           <dbl>
-    ##  1 http://mashabl~       731              8              960           0.418
-    ##  2 http://mashabl~       731             10              187           0.667
-    ##  3 http://mashabl~       731             11              315           0.551
-    ##  4 http://mashabl~       731             10             1190           0.409
-    ##  5 http://mashabl~       731              6              374           0.641
-    ##  6 http://mashabl~       729              7             1007           0.438
-    ##  7 http://mashabl~       729              9              455           0.496
-    ##  8 http://mashabl~       729             10              258           0.589
-    ##  9 http://mashabl~       729              8             1020           0.413
-    ## 10 http://mashabl~       729              8              123           0.717
-    ## # ... with 617 more rows, and 57 more variables: n_non_stop_words <dbl>,
-    ## #   n_non_stop_unique_tokens <dbl>, num_hrefs <dbl>, num_self_hrefs <dbl>,
-    ## #   num_imgs <dbl>, num_videos <dbl>, average_token_length <dbl>,
-    ## #   num_keywords <dbl>, data_channel_is_lifestyle <dbl>,
-    ## #   data_channel_is_entertainment <dbl>, data_channel_is_bus <dbl>,
-    ## #   data_channel_is_socmed <dbl>, data_channel_is_tech <dbl>,
-    ## #   data_channel_is_world <dbl>, kw_min_min <dbl>, kw_max_min <dbl>, ...
-
-=======
-
 ## Exploratory Data Analysis (EDA)
-
-### Create New Variables for EDA
 
 ``` r
 #Create New variable using weekday_is_() variables
@@ -146,27 +66,6 @@ trainDataNew <- trainData %>% mutate(day_of_the_week =   if_else(weekday_is_mond
                                               ))))))) 
 trainDataNew
 ```
-
-    ## # A tibble: 1,472 x 63
-    ##    url             timedelta n_tokens_title n_tokens_content n_unique_tokens
-    ##    <chr>               <dbl>          <dbl>            <dbl>           <dbl>
-    ##  1 http://mashabl~       731             11              103           0.689
-    ##  2 http://mashabl~       731             10              243           0.619
-    ##  3 http://mashabl~       731              8              204           0.586
-    ##  4 http://mashabl~       730             12              499           0.513
-    ##  5 http://mashabl~       729             11              223           0.662
-    ##  6 http://mashabl~       729             11             1099           0.412
-    ##  7 http://mashabl~       729             14              318           0.633
-    ##  8 http://mashabl~       729              7              144           0.723
-    ##  9 http://mashabl~       729             11             1058           0.410
-    ## 10 http://mashabl~       729              8              211           0.608
-    ## # ... with 1,462 more rows, and 58 more variables: n_non_stop_words <dbl>,
-    ## #   n_non_stop_unique_tokens <dbl>, num_hrefs <dbl>, num_self_hrefs <dbl>,
-    ## #   num_imgs <dbl>, num_videos <dbl>, average_token_length <dbl>,
-    ## #   num_keywords <dbl>, data_channel_is_lifestyle <dbl>,
-    ## #   data_channel_is_entertainment <dbl>, data_channel_is_bus <dbl>,
-    ## #   data_channel_is_socmed <dbl>, data_channel_is_tech <dbl>,
-    ## #   data_channel_is_world <dbl>, kw_min_min <dbl>, kw_max_min <dbl>, ...
 
 ``` r
 sharesSumm<-trainData %>% 
@@ -182,6 +81,12 @@ knitr ::kable(sharesSumm)
 | Min | 1st Quartile | Median | 3rd Quartile |    Max |
 |----:|-------------:|-------:|-------------:|-------:|
 |  78 |         1100 |   1700 |         3225 | 208300 |
+
+Let’s start by creating a new factor variable for the training set which
+categorizes shares based on the number of them.
+
+After creating the new variable, let’s create a contingency table for
+it.
 
 ``` r
 library(ggplot2)
@@ -202,6 +107,9 @@ knitr::kable(table(trainData$sharecategory), caption = paste0("contingency table
 
 contingency table for sharecategory
 
+Let’s now create bar plots of the number of images based on the new
+variable which is the category of shares based on the number of them.
+
 ``` r
 g<-ggplot(data=trainData,aes(x=num_imgs,fill=sharecategory))
 g+geom_bar(position="dodge")+
@@ -212,19 +120,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](LIFEST~2/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
-
-``` r
-knitr::kable(table(trainData$sharecategory,trainData$num_imgs),caption = paste("contingency table for number of images based on share category"))
-```
-
-|      |   0 |   1 |   2 |   3 |   4 |   5 |   6 |   7 |   8 |   9 |  10 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  33 |  35 |  36 |  37 |  44 |  45 |  47 |  51 |  55 | 101 | 108 | 111 |
-|:-----|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|----:|
-| few  |  84 | 276 |  37 |  19 |  16 |   9 |  15 |   6 |  13 |  11 |  15 |  36 |   6 |   4 |   4 |   3 |   3 |   4 |   2 |   2 |   4 |   1 |   1 |   0 |   0 |   1 |   0 |   0 |   0 |   0 |   0 |   0 |   0 |   0 |   0 |   1 |   0 |   0 |   0 |   0 |   0 |   0 |   0 |   0 |
-| many |  36 | 123 |  16 |   5 |   8 |   4 |   6 |   3 |   4 |   4 |  10 |  18 |   9 |   2 |   3 |   9 |   8 |   2 |   1 |   3 |   3 |   5 |   5 |   0 |   2 |   4 |   3 |   3 |   1 |   1 |   1 |   1 |   0 |   0 |   0 |   1 |   0 |   0 |   0 |   0 |   1 |   1 |   0 |   1 |
-| some |  80 | 252 |  37 |  10 |   7 |  10 |  19 |  11 |  17 |  17 |  30 |  32 |  12 |   9 |   3 |   6 |   9 |   1 |   1 |   1 |   8 |   3 |   1 |   2 |   1 |   4 |   0 |   0 |   0 |   0 |   0 |   0 |   1 |   1 |   1 |   0 |   1 |   1 |   1 |   1 |   0 |   0 |   1 |   1 |
-
-contingency table for number of images based on share category
+![](LIFEST~2/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 g<-ggplot(data=trainData,aes(x=num_videos, fill=sharecategory))
@@ -236,7 +132,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](LIFEST~2/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
+![](LIFEST~2/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 We can inspect the trend of number of images and videos and how it
 affects number of shares. If the tallest and most concentrated chunk of
@@ -287,9 +183,10 @@ g<-ggplot(data=trainData,aes(title_sentiment_polarity,color=title_sentiment_pola
 g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Title Polarity", title = "Histogram of Title Polarity based on sharecategory")+theme(legend.title=element_blank(), axis.text.x=element_text(angle=45))+scale_y_continuous(limits= c(0,1000))+facet_wrap(~sharecategory)
 ```
 
-    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+    ## `stat_bin()` using `bins = 30`. Pick better value with
+    ## `binwidth`.
 
-![](LIFEST~2/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](LIFEST~2/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 # Model fitting
 
@@ -330,7 +227,7 @@ here since these come from all news articles coming from a 2 year period
 which is a fixed amount of time.
 
 Our model for the tech channel is (lambda(shares)\~num\_imgs
-*num\_videos *average\_token\_length \*title\_sentiment\_polarity)
+*num\_videos*average\_token\_length\*title\_sentiment\_polarity)
 
 We will call this model our **Poisson Model**
 
@@ -373,9 +270,9 @@ I will then print the confusion matrix on the test set.
 ``` r
 ctrl <- trainControl(method="repeatedcv",number=5, repeats = 3)
 boostFit <- train(shares~num_imgs
-                  +num_videos
-                  +average_token_length
-                  +title_sentiment_polarity
+                  *num_videos
+                  *average_token_length
+                  *title_sentiment_polarity
                   ,data = trainData, 
                 method = "gbm", trControl = ctrl, metric = "RMSE",
                 preProcess = c("center","scale"), verbose = FALSE, 
@@ -395,14 +292,10 @@ trees along with letting the trees grow independently can lower our
 variance we are using for prediction.
 
 ``` r
-library(doParallel)
-cl <- makePSOCKcluster(5)
-registerDoParallel(cl)
 fitrf <- train(shares~num_imgs*num_videos*average_token_length*title_sentiment_polarity,method = "rf",data = trainData,
              trControl = ctrl, 
              metric = "RMSE",
              tuneGrid = data.frame(mtry = 1:3))
-stopCluster(cl)
 ```
 
 # Model Comparison
@@ -412,13 +305,19 @@ evaluate their performance in CV and on the withheld testing set.
 
 Let’s evaluate their repeated k-folds CV performance first
 
-``` r
-modelList <- list(train1, train2, boostFit)
-modelNames <- c("OLS", "Poisson Regression", "Boosted Trees")
-```
+So we first set up a list and vectors of our models to store in a
+table/data frame for later when looking at our top candidate
 
 ``` r
-cvRMSE <- unlist(
+modelList <- list(train1, train2, fitrf, boostFit)
+model_Name <- c("OLS", "Poisson Regression", "Random Forest", "Boosted tree")
+```
+
+Now let’s set up our model comparison functions that automate the
+process.
+
+``` r
+RMSEcv <- unlist(
   sapply(
     sapply(
       sapply(modelList, FUN="[", "results"), 
@@ -427,7 +326,7 @@ cvRMSE <- unlist(
     )
 )
 
-cvMAE <- unlist(
+MAEcv <- unlist(
   sapply(
     sapply(
       sapply(modelList, FUN="[", "results"), 
@@ -436,7 +335,7 @@ cvMAE <- unlist(
     )
   )
 
-cvRsquared <- unlist(
+Rsquaredcv <- unlist(
   sapply(
     sapply(
       sapply(modelList, FUN="[", "results"), 
@@ -447,15 +346,15 @@ cvRsquared <- unlist(
 
 # Create a data.frame of model performances.
 cvPerformance <- data.frame(
-  Model=modelNames,
-  RMSE=cvRMSE,
-  Rsq=cvRsquared,
-  MAE=cvMAE
+  Model=model_Name,
+  RMSE=RMSEcv,
+  Rsq=Rsquaredcv,
+  MAE=MAEcv
 )
 
 # Extract the best model's name and RMSE.
 bestModelCV <- cvPerformance %>%
-  mutate(Model = modelNames) %>%
+  mutate(Model = model_Name) %>%
   filter(RMSE == min(RMSE)) %>%
   select(Model, RMSE)
 # Save the model name and RMSE to 2 decimal places as vairables.
@@ -475,13 +374,16 @@ knitr::kable(
 |:-------------------|---------:|---------:|--------:|
 | OLS                |  6872.63 |     0.02 | 3208.25 |
 | Poisson Regression | 12005.06 |     0.02 | 3633.75 |
-| Boosted Trees      |  7164.12 |     0.02 | 3154.19 |
+| Random Forest      |  7158.84 |     0.02 | 3156.40 |
+| Boosted tree       |  7170.73 |     0.02 | 3155.33 |
 
 Table 3: Repeated k-folds CV Performance Summary
 
-The best performing model in repeated k-folds CV is the OLS with an RMSE
-of 6872.63. Usually, we would pick the best performing model here to
-test on the testing data, but we will compare them all this time.
+The best performing model in repeated k-folds CV is the Boosted Trees
+with an RMSE of 9697.71 for the training set.
+
+Usually, we would pick the best performing model here to test on the
+testing data, but we will compare them all this time.
 
 Now let’s look at their test set performance.
 
@@ -499,12 +401,12 @@ testPerformances <- sapply(
   modelList, FUN=evaluatePeformance, dataEval=testData, target="shares"
   )
 # Rename the columns with the model names.
-colnames(testPerformances) <- modelNames
+colnames(testPerformances) <- model_Name
 # Convert the table to data.frame.
 testPerformances <- as.data.frame(t(testPerformances))
 # Extract the best model's name and RMSE.
 bestModel <- testPerformances %>%
-  mutate(Model = modelNames) %>%
+  mutate(Model = model_Name) %>%
   filter(RMSE == min(RMSE)) %>%
   select(Model, RMSE)
 # Save the model name and RMSE to 2 decimal places as variables.
@@ -514,16 +416,17 @@ bestRMSE <- round(bestModel$RMSE, 2)
 knitr::kable(
   testPerformances,
   digits=2,
-  caption="Table 4: Test Set Performance Summary",)
+  caption="Testing Set Performance Summary",)
 ```
 
 |                    |     RMSE | Rsquared |     MAE |
 |:-------------------|---------:|---------:|--------:|
 | OLS                | 11046.26 |        0 | 3482.93 |
 | Poisson Regression | 55980.74 |        0 | 5611.65 |
-| Boosted Trees      | 10933.39 |        0 | 3496.46 |
+| Random Forest      | 10946.78 |        0 | 3539.18 |
+| Boosted tree       | 10946.12 |        0 | 3506.37 |
 
-Table 4: Test Set Performance Summary
+Testing Set Performance Summary
 
-The best performing model on the testing set is the Boosted Trees with
-an RMSE of 1.093339^{4}.
+The best performing model on the testing set is the Boosted tree with an
+RMSE of 1.094612^{4}.
