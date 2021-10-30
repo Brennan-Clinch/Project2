@@ -1,9 +1,8 @@
-Project02
+Technology Analysis
 ================
 Brennan Clinch
 10/29/2021
 
-Tech Analysis
 
 # Introduction
 
