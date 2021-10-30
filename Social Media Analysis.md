@@ -1,9 +1,8 @@
-Project02
+Social Media Analysis
 ================
-Brennan Clinch
+Brennan Clinch & Allison Warhus
 10/29/2021
 
-Social Media Analysis
 
 # Introduction
 
@@ -13,7 +12,7 @@ published on Mashable.com got on social media sites.We are going to use
 the following variables to predict Number of Shares. We are going to
 analyze the Online News Popularity dataset. It is a dataset which is
 used to predict the number of shares and article published on
-Mashable.com got on social media sites.We are going to use the following
+Mashable.com got on social media sites. We are going to use the following
 variables to predict Number of Shares.
 
 \*num\_imgs: Number of images
@@ -36,11 +35,6 @@ library(tidyverse)
 library(caret)
 ## Read in Raw Data Using Relative Path
 Data <- read_csv("OnlineNewsPopularity.csv") 
-```
-
-``` r
-library(caret)
-## Create a New Variable to Data Channel to use when automating.
 automationdata <- Data %>% mutate(data_channel =   if_else(data_channel_is_lifestyle == 1, "Lifestyle Analysis",
        if_else(data_channel_is_entertainment == 1, "Entertainment Analysis",
                if_else(data_channel_is_bus == 1, "Business Analysis",
@@ -48,6 +42,10 @@ automationdata <- Data %>% mutate(data_channel =   if_else(data_channel_is_lifes
                               if_else(data_channel_is_tech == 1, "Tech Analysis", "World Analysis"))))))
 ## Subset Data for Respective Data Channel
 subsetted_data <- automationdata %>% filter(data_channel == params$data_channel)
+```
+Let's now split up our subsetted data sets to training and testing (70/30).
+
+``` r
 ## Create Training and Test Data Sets
 set.seed(500)
 trainIndex <- createDataPartition(subsetted_data$shares, p = 0.7, list = FALSE)
@@ -57,6 +55,10 @@ trainData
 ```
 
 ## Exploratory Data Analysis (EDA)
+
+Now that we have our data split up, we are ready to do exploratory data analysis on all the variables we will be using in our predictive models.
+
+Let us first take a look at shares. We created a new variable sharesSumm that provides a 5-number summary of shares for the Social Media channel.
 
 ``` r
 sharesSumm<-trainData %>% 
@@ -75,7 +77,9 @@ knitr ::kable(sharesSumm, caption = "5-number summary for number of shares")
 
 5-number summary for number of shares
 
-Let’s start by creating a new factor variable for the training set which
+Based on the 5-number summary, it does appear our data might be skewed since the Max is way off from the Min, Q1,Median, and Q3. So our median tells us a better estimate on our average number of shares here.
+
+Let’s create a new factor variable for the training set which
 categorizes shares based on the number of them.
 
 After creating the new variable, let’s create a contingency table for
@@ -100,8 +104,9 @@ knitr::kable(table(trainData$sharecategory), caption = paste0("contingency table
 
 contingency table for sharecategory
 
-Let’s now create bar plots of the number of images based on the new
-variable which is the category of shares based on the number of them.
+From the table, it appears that for the Social Media channel, most shares were between 1400 and 3800 and the least were less than 1400.
+
+Let’s now create bar plots of the number of images and the number of videos based on the new variable which is the category of shares based on the number of them.
 
 ``` r
 g<-ggplot(data=trainData,aes(x=num_imgs,fill=sharecategory))
@@ -115,6 +120,8 @@ g+geom_bar(position="dodge")+
 
 ![](SOCIAL~2/unnamed-chunk-6-1.png)<!-- -->
 
+Looking at the plots, it appears our data is extremely skewed with most of the number of images being equal to zero especially when share category was equal to 'some', so while most images were not a lot and were mostly zero, the more average the shares the fewer the number of images for each article in the Social Media channel.
+
 ``` r
 g<-ggplot(data=trainData,aes(x=num_videos, fill=sharecategory))
 g+geom_bar(position="dodge")+
@@ -127,6 +134,8 @@ g+geom_bar(position="dodge")+
 
 ![](SOCIAL~2/unnamed-chunk-7-1.png)<!-- -->
 
+Looking at the plots, it appears our data is extremely skewed with most of the number of videos being equal to zero especially when share category was equal to 'some', so while most videos were not a lot and were mostly zero, the more average the shares the fewer the number of videos for each article in the Social Media channel. 
+
 We can inspect the trend of number of images and videos and how it
 affects number of shares. If the tallest and most concentrated chunk of
 bars is in a different spot for each share category, then we can
@@ -135,7 +144,7 @@ are looking at) is related to the number of shares. If each of the three
 graphs looks the same, then we would conclude that images and videos do
 not necessarily impact the number of shares.
 
-I hypothesize that the shorter the average word length, the more popular
+We will hypothesize that the shorter the average word length, the more popular
 a media item will be. So we will analyze word length next. First, let’s
 get the mean and standard deviation of word length in all of the media
 items. Next, we can look at how word length differs based on share
@@ -154,6 +163,8 @@ knitr ::kable(wordSumm, caption = "Mean and Standard deviation of average word l
 
 Mean and Standard deviation of average word length
 
+From the summary, it appears the mean of average word length for the Lifestyle channel was 4.63 and the standard deviation was 0.43.
+
 ``` r
 wordSumm2<-trainData %>% group_by(sharecategory) %>%
   summarize("Mean"=mean(average_token_length),
@@ -169,6 +180,8 @@ knitr ::kable(wordSumm2, caption = "Mean and Standard deviation of average word 
 
 Mean and Standard deviation of average word length by share category
 
+Looking at the summary statistics, the share category that got the lowest mean was 'few', the highest mean was 'some', the lowest standard deviation was 'some', and the highest standard deviation was 'few'.
+
 This can better be summarized with the boxplots below
 
 ``` r
@@ -179,7 +192,9 @@ g1+geom_boxplot()+
 
 ![](SOCIAL~2/unnamed-chunk-10-1.png)<!-- -->
 
-Finally, we’ll explore the title polarity vs. the share category.
+From the boxplots, it does appear that each boxplot is a little bit symmetrical in distribution by looking at the box part with q1, median, and q3, but it does appear that it may be a bit skewed since we have many outlying values. We can also clearly see that `few` has the highest maximum.
+
+Finally, we’ll explore the title polarity vs. the share category from a histogram.
 
 ``` r
 g<-ggplot(data=trainData,aes(title_sentiment_polarity,color=title_sentiment_polarity))
@@ -191,7 +206,11 @@ g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Ti
 
 ![](SOCIAL~2/unnamed-chunk-11-1.png)<!-- -->
 
+Based on the histograms, it does look like the histograms are a little symmetric (not exactly normal though) with most values of Title Polarity being close to zero. The share category that had the most frequency of being close to zero was some. So articles with title polarity close to zero and having shares that are 1400 to 3800 will most likely be shared more often.
+
 # Model fitting
+
+Now that we have done basic EDA on our data and variables we are analyzing, we are ready to start doing our predictive modeling.
 
 ## Linear Models
 
@@ -221,6 +240,8 @@ train1<-train(shares~num_imgs
               trControl=trainControl(method="cv",number=10))
 ```
 
+Our model for the Lifestyle channel using OLS is a linear model with shares as the response and all interactions between number of images, number of videos, average token length, and title polarity as the predictors. We can call this model our **OLS**.
+
 ### Model 2: Poisson Regression model (GLM)
 
 The second model we will be creating is a poisson regression model which
@@ -229,10 +250,6 @@ the previous variables for all the interaction terms. We can use poisson
 here since these come from all news articles coming from a 2 year period
 which is a fixed amount of time.
 
-Our model for the tech channel is (lambda(shares)\~num\_imgs
-*num\_videos*average\_token\_length\*title\_sentiment\_polarity)
-
-We will call this model our **Poisson Model**
 
 ``` r
 train2 <- train(shares~num_imgs
@@ -245,6 +262,10 @@ train2 <- train(shares~num_imgs
               preProcess=c("center","scale"),
               trControl=trainControl(method="cv",number=10))
 ```
+
+Our model for the Social Media channel is lambda(shares) as the response and all interactions of number of images, number of videos, average word length, and title polarity as the predictors.
+
+We will call this model our **Poisson Regression**
 
 # Ensemble Methods
 
@@ -285,6 +306,8 @@ boostFit <- train(shares~num_imgs
                               n.minobsinnode = 10))
 ```
 
+Our model here can be called **Boosted tree**.
+
 ## Random Forest
 
 The idea of Random Forests is that they generate `B` bootstrapped
@@ -301,24 +324,18 @@ fitrf <- train(shares~num_imgs*num_videos*average_token_length*title_sentiment_p
              tuneGrid = data.frame(mtry = 1:3))
 ```
 
+Our model here can be called **Random Forest**.
+
 # Model Comparison
 
-With the repeated k-folds CV completed and our models fit, we can
-evaluate their performance in CV and on the withheld testing set.
+With the repeated k-folds CV completed and our models fit, we can evaluate their performance on the withheld testing set.
 
-Let’s evaluate their repeated k-folds CV performance first
-
-So we first set up a list and vectors of our models to store in a
-table/data frame for later when looking at our top candidate
+So we first set up a list and vectors of our models to store in a table/data frame for later when looking at our top candidate
 
 ``` r
 model_Name <- c("OLS", "Poisson Regression", "Random Forest", "Boosted tree")
-
-train1$results
-train2$results
-fitrf$results
-boostFit$results
 ```
+Now let's use our models on the testing set and see how well they do to pick our best model for the Social Media channel.
 
 ``` r
 pred1 <- predict(train1, newdata = testData)
