@@ -243,7 +243,7 @@ train1<-train(shares~num_imgs
               preProcess=c("center","scale"),
               trControl=trainControl(method="cv",number=10))
 ```
-(shares~num_imgs*num_videos*average_token_length*title_sentiment_polarity)
+Our model for the Business channel using OLS is a linear model with shares as the response and all interactions between number of images, number of videos, average token length, and title polarity as the predictors. We can call this model our **OLS**.
 
 ### Model 2: Poisson Regression model (GLM)
 
@@ -253,10 +253,8 @@ the previous variables for all the interaction terms. We can use poisson
 here since these come from all news articles coming from a 2 year period
 which is a fixed amount of time.
 
-Our model for the tech channel is (lambda(shares)\~num\_imgs
-*num\_videos*average\_token\_length\*title\_sentiment\_polarity)
 
-We will call this model our **Poisson Model**
+
 
 ``` r
 train2 <- train(shares~num_imgs
@@ -269,6 +267,11 @@ train2 <- train(shares~num_imgs
               preProcess=c("center","scale"),
               trControl=trainControl(method="cv",number=10))
 ```
+
+Our model for the Business channel is lambda(shares) as the response and all interactions of number of images, number of videos, average word length, and title polarity as the predictors.
+
+We will call this model our **Poisson Regression**
+
 
 # Ensemble Methods
 
@@ -308,6 +311,7 @@ boostFit <- train(shares~num_imgs
                               interaction.depth = c(1:4),
                               n.minobsinnode = 10))
 ```
+Our model here can be called **Boosted tree**
 
 ## Random Forest
 
@@ -319,31 +323,31 @@ trees along with letting the trees grow independently can lower our
 variance we are using for prediction.
 
 ``` r
-fitrf <- train(shares~num_imgs*num_videos*average_token_length*title_sentiment_polarity,method = "rf",data = trainData,
-             trControl = ctrl, 
-             metric = "RMSE",
-             tuneGrid = data.frame(mtry = 1:3))
+fitrf <- train(shares~num_imgs
+               *num_videos
+               *average_token_length
+               *title_sentiment_polarity,
+                method = "rf",
+                data = trainData,
+                trControl = ctrl, 
+                metric = "RMSE",
+                tuneGrid = data.frame(mtry = 1:3))
 ```
+
+Our model here can be called **Random Forest**
 
 # Model Comparison
 
 With the repeated k-folds CV completed and our models fit, we can
-evaluate their performance in CV and on the withheld testing set.
-
-Let’s evaluate their repeated k-folds CV performance first
+evaluate their performance on the withheld testing set.
 
 So we first set up a list and vectors of our models to store in a
 table/data frame for later when looking at our top candidate
 
 ``` r
 model_Name <- c("OLS", "Poisson Regression", "Random Forest", "Boosted tree")
-
-train1$results
-train2$results
-fitrf$results
-boostFit$results
 ```
-
+Now let's use our models on the testing set and see how well they do to pick our best model for the Business channel.
 ``` r
 pred1 <- predict(train1, newdata = testData)
 OLS <- postResample(pred1, obs = testData$shares)
