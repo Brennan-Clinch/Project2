@@ -1,6 +1,6 @@
 ---
 title: "Project02"
-author: "Brennan Clinch"
+author: "Brennan Clinch, Allison Warhus"
 date: "10/29/2021"
 output: github_document
 params:
@@ -355,94 +355,4 @@ knitr::kable(
 
 The best performing model on the testing set is the `r BestModel` with
 an RMSE of `r BestModelRMSE`.
-
-
-```{r, echo = F, eval = F}
-RMSEcv <- unlist(
-  sapply(
-    sapply(
-      sapply(modelList, FUN="[", "results"), 
-      FUN=filter, RMSE==min(RMSE)), 
-    FUN="[", "RMSE"
-    )
-)
-
-MAEcv <- unlist(
-  sapply(
-    sapply(
-      sapply(modelList, FUN="[", "results"), 
-      FUN=filter, MAE==min(MAE)), 
-    FUN="[", "MAE"
-    )
-  )
-
-Rsquaredcv <- unlist(
-  sapply(
-    sapply(
-      sapply(modelList, FUN="[", "results"), 
-      FUN=filter, Rsquared==max(Rsquared)), 
-    FUN="[", "Rsquared"
-    )
-  )
-
-# Create a data.frame of model performances.
-cvPerformance <- data.frame(
-  Model=model_Name,
-  RMSE=RMSEcv,
-  Rsq=Rsquaredcv,
-  MAE=MAEcv
-)
-
-
-bestModelCV <- cvPerformance %>%
-  mutate(Model = model_Name) %>%
-  filter(RMSE == min(RMSE)) %>%
-  select(Model, RMSE)
-# Save the model name and RMSE to 2 decimal places as vairables.
-bestModelNameCV <- bestModelCV$Model
-bestRMSECV <- round(bestModelCV$RMSE, 2)
-
-# Display the table in a neat format.
-knitr::kable(
-  cvPerformance,
-  digits=2,
-  caption="Table 3: Repeated k-folds CV Performance Summary",
-  col.names=c("", "RMSE", "Rsquared", "MAE")
-)
-```
-
-
-
-```{r, eval = F}
-evaluatePeformance <- function(model, dataEval, target){
-  ###
-  # This function takes in a fit model, testing data (tibble), and a target
-  # variable (string) and returns the performance.
-  ###
-  preds <- predict(model, newdata=dataEval)
-  return(postResample(preds, pull(dataEval, target)))
-}
-# Get the test set performances.
-testPerformances <- sapply(
-  modelList, FUN=evaluatePeformance, dataEval=testData, target="shares"
-  )
-# Rename the columns with the model names.
-colnames(testPerformances) <- model_Name
-# Convert the table to data.frame.
-testPerformances <- as.data.frame(t(testPerformances))
-# Extract the best model's name and RMSE.
-bestModel <- testPerformances %>%
-  mutate(Model = model_Name) %>%
-  filter(RMSE == min(RMSE)) %>%
-  select(Model, RMSE)
-# Save the model name and RMSE to 2 decimal places as variables.
-bestModelName <- bestModel$Model
-bestRMSE <- round(bestModel$RMSE, 2)
-# Display the table in a neat format.
-knitr::kable(
-  testPerformances,
-  digits=2,
-  caption="Testing Set Performance Summary",)
-```
-
 
