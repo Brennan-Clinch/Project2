@@ -113,7 +113,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](ENTERT~2/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](ENTERT~2/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 g<-ggplot(data=trainData,aes(x=num_videos, fill=sharecategory))
@@ -125,7 +125,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](ENTERT~2/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](ENTERT~2/unnamed-chunk-8-1.png)<!-- -->
 
 We can inspect the trend of number of images and videos and how it
 affects number of shares. If the tallest and most concentrated chunk of
@@ -177,7 +177,7 @@ g1+geom_boxplot()+
   labs(title = "boxplots of average word length based on shares category", x = "shares category", y = "average word length")
 ```
 
-![](ENTERT~2/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](ENTERT~2/unnamed-chunk-11-1.png)<!-- -->
 
 Finally, we’ll explore the title polarity vs. the share category.
 
@@ -191,7 +191,7 @@ g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Ti
 
     ## Warning: Removed 1 rows containing missing values (geom_bar).
 
-![](ENTERT~2/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](ENTERT~2/unnamed-chunk-12-1.png)<!-- -->
 
 # Model fitting
 
