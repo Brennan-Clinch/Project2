@@ -1,9 +1,4 @@
-World Analysis
-================
-Brennan Clinch
-10/29/2021
-
-# Introduction
+World Analysis 
 
 We are going to analyze the Online News Popularity dataset. It is a
 dataset which is used to predict the number of shares and article
@@ -29,44 +24,38 @@ ensemble based tree methods, including random forest and boosted trees.
 
 # Import and Subset data
 
+To get started, we want to read in and subset our data to only include data from the World channel
+
 ``` r
 library(tidyverse)
 ## Read in Raw Data Using Relative Path
-rawData <- read_csv("OnlineNewsPopularity.csv") 
+data <- read_csv("OnlineNewsPopularity.csv") 
+data_subset <- rawDataNew %>% filter(data_channel == params$data_channel)
 ```
-
+Next we want to create an object called `RawDataNew` which then will allow us to subset data for specific channels used in the automation.
 ``` r
-library(caret)
 ## Create a New Variable to Data Channel to use when automating.
 rawDataNew <- rawData %>% mutate(data_channel =   if_else(data_channel_is_bus == 1, "Business Analysis",
        if_else(data_channel_is_entertainment == 1, "Entertainment Analysis",
                if_else(data_channel_is_lifestyle == 1, "Lifestyle Analysis",
                       if_else(data_channel_is_socmed == 1, "Social Media Analysis",
                               if_else(data_channel_is_tech == 1, "Tech Analysis", "World Analysis"))))))
-## Subset Data for Respective Data Channel
-subsetData <- rawDataNew %>% filter(data_channel == params$data_channel)
-## Create Training and Test Data Sets
+```
+Let's now divide our data into training and test sets for use with predictive modeling
+``` r
+library(caret)
 set.seed(500)
 trainIndex <- createDataPartition(subsetData$shares, p = 0.7, list = FALSE)
-trainData <- subsetData[trainIndex,]
-testData <- subsetData[-trainIndex,]
+trainData <- data_subset[trainIndex,]
+testData <- data_subset[-trainIndex,]
 trainData
 ```
 
 ## Exploratory Data Analysis (EDA)
+Now that we have our data set up and split into training and testing, we can do our exploratory data analysis on the variables we are interested in from the introduction that we 
+will use in our predictive models
 
-``` r
-#Create New variable using weekday_is_() variables
-trainDataNew <- trainData %>% mutate(day_of_the_week =   if_else(weekday_is_monday == 1, "Monday",
-       if_else(weekday_is_tuesday == 1, "Tuesday",
-               if_else(weekday_is_wednesday == 1, "Wednesday",
-                      if_else(weekday_is_thursday == 1, "Thursday",
-                              if_else(weekday_is_friday == 1, "Friday",
-                                      if_else(weekday_is_saturday == 1, "Saturday", "Sunday"
-                                              ))))))) 
-trainDataNew
-```
-
+The first thing we want to explore is the distribution of shares.
 ``` r
 sharesSumm<-trainData %>% 
   summarize("Min"=min(shares),
@@ -82,10 +71,13 @@ knitr ::kable(sharesSumm)
 |----:|-------------:|-------:|-------------:|-------:|
 |   4 |          899 |   1300 |         2800 | 843300 |
 
+
+We can clearly see that from th five-number summary of shares for the World channel, on average most shares a little over 1000 as seen by the median.
+
 Let’s start by creating a new factor variable for the training set which
 categorizes shares based on the number of them.
 
-After creating the new variable, let’s create a contingency table for
+And after creating the new variable, let’s create a contingency table for
 it.
 
 ``` r
