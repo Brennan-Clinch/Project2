@@ -358,34 +358,3 @@ Testing Set Performance Summary
 The best performing model on the testing set is the OLS with an RMSE of
 4254.9776048.
 
-``` r
-evaluatePeformance <- function(model, dataEval, target){
-  ###
-  # This function takes in a fit model, testing data (tibble), and a target
-  # variable (string) and returns the performance.
-  ###
-  preds <- predict(model, newdata=dataEval)
-  return(postResample(preds, pull(dataEval, target)))
-}
-# Get the test set performances.
-testPerformances <- sapply(
-  modelList, FUN=evaluatePeformance, dataEval=testData, target="shares"
-  )
-# Rename the columns with the model names.
-colnames(testPerformances) <- model_Name
-# Convert the table to data.frame.
-testPerformances <- as.data.frame(t(testPerformances))
-# Extract the best model's name and RMSE.
-bestModel <- testPerformances %>%
-  mutate(Model = model_Name) %>%
-  filter(RMSE == min(RMSE)) %>%
-  select(Model, RMSE)
-# Save the model name and RMSE to 2 decimal places as variables.
-bestModelName <- bestModel$Model
-bestRMSE <- round(bestModel$RMSE, 2)
-# Display the table in a neat format.
-knitr::kable(
-  testPerformances,
-  digits=2,
-  caption="Testing Set Performance Summary",)
-```
