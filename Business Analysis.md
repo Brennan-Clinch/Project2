@@ -120,7 +120,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](BUSINE~2/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](BUSINE~1/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 g<-ggplot(data=trainData,aes(x=num_videos, fill=sharecategory))
@@ -132,7 +132,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](BUSINE~2/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](BUSINE~1/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 We can inspect the trend of number of images and videos and how it
 affects number of shares. If the tallest and most concentrated chunk of
