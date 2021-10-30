@@ -1,12 +1,11 @@
 ---
 title: "Project02"
-author: "Brennan Clinch"
+author: "Brennan Clinch, Allison Warhus"
 date: "10/29/2021"
 output: github_document
 params:
   data_channel: "params$data_channel"
 ---
-`r params$data_channel`
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
