@@ -113,7 +113,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](TECHAN~1/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](TECHAN~1/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 g<-ggplot(data=trainData,aes(x=num_videos, fill=sharecategory))
