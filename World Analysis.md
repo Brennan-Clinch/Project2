@@ -1,9 +1,8 @@
-Project02
+World Analysis
 ================
 Brennan Clinch
 10/29/2021
 
-World Analysis
 
 # Introduction
 
