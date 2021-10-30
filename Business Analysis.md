@@ -132,7 +132,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](Business Analysis_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](Business_Analysis_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 We can inspect the trend of number of images and videos and how it
 affects number of shares. If the tallest and most concentrated chunk of
