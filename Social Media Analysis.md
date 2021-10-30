@@ -1,7 +1,9 @@
-Untitled
+Project02
 ================
 Brennan Clinch
 10/29/2021
+
+Social Media Analysis
 
 # Introduction
 
@@ -31,41 +33,30 @@ ensemble based tree methods, including random forest and boosted trees.
 
 ``` r
 library(tidyverse)
+library(caret)
 ## Read in Raw Data Using Relative Path
-rawData <- read_csv("OnlineNewsPopularity.csv") 
+Data <- read_csv("OnlineNewsPopularity.csv") 
 ```
 
 ``` r
 library(caret)
 ## Create a New Variable to Data Channel to use when automating.
-rawDataNew <- rawData %>% mutate(data_channel =   if_else(data_channel_is_bus == 1, "Business Analysis",
+automationdata <- Data %>% mutate(data_channel =   if_else(data_channel_is_lifestyle == 1, "Lifestyle Analysis",
        if_else(data_channel_is_entertainment == 1, "Entertainment Analysis",
-               if_else(data_channel_is_lifestyle == 1, "Lifestyle Analysis",
+               if_else(data_channel_is_bus == 1, "Business Analysis",
                       if_else(data_channel_is_socmed == 1, "Social Media Analysis",
                               if_else(data_channel_is_tech == 1, "Tech Analysis", "World Analysis"))))))
 ## Subset Data for Respective Data Channel
-subsetData <- rawDataNew %>% filter(data_channel == params$data_channel)
+subsetted_data <- automationdata %>% filter(data_channel == params$data_channel)
 ## Create Training and Test Data Sets
 set.seed(500)
-trainIndex <- createDataPartition(subsetData$shares, p = 0.7, list = FALSE)
-trainData <- subsetData[trainIndex,]
-testData <- subsetData[-trainIndex,]
+trainIndex <- createDataPartition(subsetted_data$shares, p = 0.7, list = FALSE)
+trainData <- subsetted_data[trainIndex,]
+testData <- subsetted_data[-trainIndex,]
 trainData
 ```
 
 ## Exploratory Data Analysis (EDA)
-
-``` r
-#Create New variable using weekday_is_() variables
-trainDataNew <- trainData %>% mutate(day_of_the_week =   if_else(weekday_is_monday == 1, "Monday",
-       if_else(weekday_is_tuesday == 1, "Tuesday",
-               if_else(weekday_is_wednesday == 1, "Wednesday",
-                      if_else(weekday_is_thursday == 1, "Thursday",
-                              if_else(weekday_is_friday == 1, "Friday",
-                                      if_else(weekday_is_saturday == 1, "Saturday", "Sunday"
-                                              ))))))) 
-trainDataNew
-```
 
 ``` r
 sharesSumm<-trainData %>% 
@@ -75,12 +66,14 @@ sharesSumm<-trainData %>%
             "3rd Quartile"=quantile(shares,0.75),
             "Max"=max(shares)
             )
-knitr ::kable(sharesSumm)
+knitr ::kable(sharesSumm, caption = "5-number summary for number of shares")
 ```
 
 | Min | 1st Quartile | Median | 3rd Quartile |    Max |
 |----:|-------------:|-------:|-------------:|-------:|
 |  23 |         1400 |   2100 |         3800 | 122800 |
+
+5-number summary for number of shares
 
 Let’s start by creating a new factor variable for the training set which
 categorizes shares based on the number of them.
@@ -120,7 +113,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](SOCIAL~2/unnamed-chunk-7-1.png)<!-- -->
+![](SOCIAL~2/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 g<-ggplot(data=trainData,aes(x=num_videos, fill=sharecategory))
@@ -132,7 +125,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](SOCIAL~2/unnamed-chunk-8-1.png)<!-- -->
+![](SOCIAL~2/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 We can inspect the trend of number of images and videos and how it
 affects number of shares. If the tallest and most concentrated chunk of
@@ -176,6 +169,16 @@ knitr ::kable(wordSumm2, caption = "Mean and Standard deviation of average word 
 
 Mean and Standard deviation of average word length by share category
 
+This can better be summarized with the boxplots below
+
+``` r
+g1 <- ggplot(data = trainData, aes(x=sharecategory, y = average_token_length, color = sharecategory))
+g1+geom_boxplot()+
+  labs(title = "boxplots of average word length based on shares category", x = "shares category", y = "average word length")
+```
+
+![](SOCIAL~2/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
 Finally, we’ll explore the title polarity vs. the share category.
 
 ``` r
@@ -186,7 +189,7 @@ g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Ti
     ## `stat_bin()` using `bins = 30`. Pick better value with
     ## `binwidth`.
 
-![](SOCIAL~2/unnamed-chunk-11-1.png)<!-- -->
+![](SOCIAL~2/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 # Model fitting
 
@@ -309,83 +312,50 @@ So we first set up a list and vectors of our models to store in a
 table/data frame for later when looking at our top candidate
 
 ``` r
-modelList <- list(train1, train2, fitrf, boostFit)
 model_Name <- c("OLS", "Poisson Regression", "Random Forest", "Boosted tree")
-```
 
-Now let’s set up our model comparison functions that automate the
-process.
+train1$results
+train2$results
+fitrf$results
+boostFit$results
+```
 
 ``` r
-RMSEcv <- unlist(
-  sapply(
-    sapply(
-      sapply(modelList, FUN="[", "results"), 
-      FUN=filter, RMSE==min(RMSE)), 
-    FUN="[", "RMSE"
-    )
-)
+pred1 <- predict(train1, newdata = testData)
+OLS <- postResample(pred1, obs = testData$shares)
+pred2 <- predict(train2,newdata = testData)
+Poisson <- postResample(pred2,testData$shares)
+pred3 <- predict(fitrf, newdata = testData)
+Random_Forest <- postResample(pred3, testData$shares)
+pred4 <- predict(boostFit, newdata = testData)
+Boosted_Tree <- postResample(pred4,testData$shares)
 
-MAEcv <- unlist(
-  sapply(
-    sapply(
-      sapply(modelList, FUN="[", "results"), 
-      FUN=filter, MAE==min(MAE)), 
-    FUN="[", "MAE"
-    )
-  )
+resultsdf <- data.frame(OLS,Poisson,Random_Forest,Boosted_Tree)
+resultsdf
+colnames(resultsdf)= model_Name
+results <- as.data.frame(t(resultsdf))
+FinalModel <- results %>% mutate(Model= model_Name) %>% filter(RMSE ==min(RMSE))%>% select(Model,RMSE)
 
-Rsquaredcv <- unlist(
-  sapply(
-    sapply(
-      sapply(modelList, FUN="[", "results"), 
-      FUN=filter, Rsquared==max(Rsquared)), 
-    FUN="[", "Rsquared"
-    )
-  )
 
-# Create a data.frame of model performances.
-cvPerformance <- data.frame(
-  Model=model_Name,
-  RMSE=RMSEcv,
-  Rsq=Rsquaredcv,
-  MAE=MAEcv
-)
-
-# Extract the best model's name and RMSE.
-bestModelCV <- cvPerformance %>%
-  mutate(Model = model_Name) %>%
-  filter(RMSE == min(RMSE)) %>%
-  select(Model, RMSE)
-# Save the model name and RMSE to 2 decimal places as vairables.
-bestModelNameCV <- bestModelCV$Model
-bestRMSECV <- round(bestModelCV$RMSE, 2)
-
-# Display the table in a neat format.
+BestModel <- FinalModel$Model
+BestModelRMSE <- FinalModel$RMSE
 knitr::kable(
-  cvPerformance,
-  digits=2,
-  caption="Table 3: Repeated k-folds CV Performance Summary",
-  col.names=c("", "RMSE", "Rsquared", "MAE")
-)
+  results,
+  digits=3,
+  caption="Testing Set Performance Summary",)
 ```
 
-|                    |    RMSE | Rsquared |     MAE |
-|:-------------------|--------:|---------:|--------:|
-| OLS                | 5195.31 |     0.01 | 2654.65 |
-| Poisson Regression | 5524.60 |     0.01 | 2680.61 |
-| Random Forest      | 5399.74 |     0.00 | 2642.36 |
-| Boosted tree       | 5382.77 |     0.00 | 2624.39 |
+|                    |     RMSE | Rsquared |      MAE |
+|:-------------------|---------:|---------:|---------:|
+| OLS                | 5426.832 |    0.005 | 2728.126 |
+| Poisson Regression | 5427.601 |    0.005 | 2728.514 |
+| Random Forest      | 5412.697 |    0.013 | 2711.906 |
+| Boosted tree       | 5390.132 |    0.031 | 2726.570 |
 
-Table 3: Repeated k-folds CV Performance Summary
+Testing Set Performance Summary
 
-The best performing model in repeated k-folds CV is the Boosted Trees
-with an RMSE of 9697.71 for the training set.
-
-Usually, we would pick the best performing model here to test on the
-testing data, but we will compare them all this time.
-
-Now let’s look at their test set performance.
+The best performing model on the testing set is the Boosted tree with an
+RMSE of 5390.131958.
 
 ``` r
 evaluatePeformance <- function(model, dataEval, target){
@@ -418,15 +388,3 @@ knitr::kable(
   digits=2,
   caption="Testing Set Performance Summary",)
 ```
-
-|                    |    RMSE | Rsquared |     MAE |
-|:-------------------|--------:|---------:|--------:|
-| OLS                | 5426.83 |     0.01 | 2728.13 |
-| Poisson Regression | 5427.60 |     0.00 | 2728.51 |
-| Random Forest      | 5412.70 |     0.01 | 2711.91 |
-| Boosted tree       | 5390.13 |     0.03 | 2726.57 |
-
-Testing Set Performance Summary
-
-The best performing model on the testing set is the Boosted tree with an
-RMSE of 5390.13.

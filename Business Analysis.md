@@ -3,7 +3,7 @@ Project02
 Brennan Clinch
 10/29/2021
 
-Tech Analysis
+Business Analysis
 
 # Introduction
 
@@ -71,7 +71,7 @@ knitr ::kable(sharesSumm, caption = "5-number summary for number of shares")
 
 | Min | 1st Quartile | Median | 3rd Quartile |    Max |
 |----:|-------------:|-------:|-------------:|-------:|
-|  36 |         1100 |   1700 |         3000 | 663600 |
+|   1 |       952.25 |   1400 |         2500 | 652900 |
 
 5-number summary for number of shares
 
@@ -94,9 +94,9 @@ knitr::kable(table(trainData$sharecategory), caption = paste0("contingency table
 
 | Var1 | Freq |
 |:-----|-----:|
-| few  | 1837 |
-| many |  929 |
-| some | 2379 |
+| few  | 2062 |
+| many |  596 |
+| some | 1724 |
 
 contingency table for sharecategory
 
@@ -113,7 +113,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](TECHAN~1/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](BUSINE~2/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 g<-ggplot(data=trainData,aes(x=num_videos, fill=sharecategory))
@@ -125,7 +125,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](TECHAN~1/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](BUSINE~2/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 We can inspect the trend of number of images and videos and how it
 affects number of shares. If the tallest and most concentrated chunk of
@@ -150,7 +150,7 @@ knitr ::kable(wordSumm, caption = "Mean and Standard deviation of average word l
 
 |     Mean | Standard Deviation |
 |---------:|-------------------:|
-| 4.582233 |          0.3586704 |
+| 4.685138 |           0.415812 |
 
 Mean and Standard deviation of average word length
 
@@ -163,9 +163,9 @@ knitr ::kable(wordSumm2, caption = "Mean and Standard deviation of average word 
 
 | sharecategory |     Mean | Standard Deviation |
 |:--------------|---------:|-------------------:|
-| few           | 4.588598 |          0.2999857 |
-| many          | 4.564346 |          0.4664693 |
-| some          | 4.584304 |          0.3517432 |
+| few           | 4.702134 |          0.3785594 |
+| many          | 4.643367 |          0.4694706 |
+| some          | 4.679250 |          0.4371610 |
 
 Mean and Standard deviation of average word length by share category
 
@@ -177,7 +177,7 @@ g1+geom_boxplot()+
   labs(title = "boxplots of average word length based on shares category", x = "shares category", y = "average word length")
 ```
 
-![](TECHAN~1/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](BUSINE~2/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 Finally, we’ll explore the title polarity vs. the share category.
 
@@ -189,9 +189,9 @@ g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Ti
     ## `stat_bin()` using `bins = 30`. Pick better value with
     ## `binwidth`.
 
-    ## Warning: Removed 2 rows containing missing values (geom_bar).
+    ## Warning: Removed 1 rows containing missing values (geom_bar).
 
-![](TECHAN~1/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](BUSINE~2/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 # Model fitting
 
@@ -347,17 +347,17 @@ knitr::kable(
   caption="Testing Set Performance Summary",)
 ```
 
-|                    |     RMSE | Rsquared |      MAE |
-|:-------------------|---------:|---------:|---------:|
-| OLS                | 4254.978 |    0.004 | 2282.265 |
-| Poisson Regression | 4263.756 |    0.002 | 2280.226 |
-| Random Forest      | 4765.788 |    0.000 | 2360.382 |
-| Boosted tree       | 4278.184 |    0.003 | 2265.890 |
+|                    |         RMSE | Rsquared |          MAE |
+|:-------------------|-------------:|---------:|-------------:|
+| OLS                | 1.950946e+04 |    0.000 | 3.043869e+03 |
+| Poisson Regression | 1.674517e+11 |    0.000 | 3.866104e+09 |
+| Random Forest      | 1.832405e+04 |    0.004 | 2.915102e+03 |
+| Boosted tree       | 1.834421e+04 |    0.000 | 2.850638e+03 |
 
 Testing Set Performance Summary
 
-The best performing model on the testing set is the OLS with an RMSE of
-4254.9776048.
+The best performing model on the testing set is the Random Forest with
+an RMSE of 1.8324048^{4}.
 
 ``` r
 evaluatePeformance <- function(model, dataEval, target){

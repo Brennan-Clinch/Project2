@@ -1,4 +1,11 @@
-World Analysis 
+Project02
+================
+Brennan Clinch
+10/29/2021
+
+World Analysis
+
+# Introduction
 
 We are going to analyze the Online News Popularity dataset. It is a
 dataset which is used to predict the number of shares and article
@@ -24,38 +31,33 @@ ensemble based tree methods, including random forest and boosted trees.
 
 # Import and Subset data
 
-To get started, we want to read in and subset our data to only include data from the World channel
-
 ``` r
 library(tidyverse)
+library(caret)
 ## Read in Raw Data Using Relative Path
-data <- read_csv("OnlineNewsPopularity.csv") 
-data_subset <- rawDataNew %>% filter(data_channel == params$data_channel)
+Data <- read_csv("OnlineNewsPopularity.csv") 
 ```
-Next we want to create an object called `RawDataNew` which then will allow us to subset data for specific channels used in the automation.
-``` r
-## Create a New Variable to Data Channel to use when automating.
-rawDataNew <- rawData %>% mutate(data_channel =   if_else(data_channel_is_bus == 1, "Business Analysis",
-       if_else(data_channel_is_entertainment == 1, "Entertainment Analysis",
-               if_else(data_channel_is_lifestyle == 1, "Lifestyle Analysis",
-                      if_else(data_channel_is_socmed == 1, "Social Media Analysis",
-                              if_else(data_channel_is_tech == 1, "Tech Analysis", "World Analysis"))))))
-```
-Let's now divide our data into training and test sets for use with predictive modeling
+
 ``` r
 library(caret)
+## Create a New Variable to Data Channel to use when automating.
+automationdata <- Data %>% mutate(data_channel =   if_else(data_channel_is_lifestyle == 1, "Lifestyle Analysis",
+       if_else(data_channel_is_entertainment == 1, "Entertainment Analysis",
+               if_else(data_channel_is_bus == 1, "Business Analysis",
+                      if_else(data_channel_is_socmed == 1, "Social Media Analysis",
+                              if_else(data_channel_is_tech == 1, "Tech Analysis", "World Analysis"))))))
+## Subset Data for Respective Data Channel
+subsetted_data <- automationdata %>% filter(data_channel == params$data_channel)
+## Create Training and Test Data Sets
 set.seed(500)
-trainIndex <- createDataPartition(subsetData$shares, p = 0.7, list = FALSE)
-trainData <- data_subset[trainIndex,]
-testData <- data_subset[-trainIndex,]
+trainIndex <- createDataPartition(subsetted_data$shares, p = 0.7, list = FALSE)
+trainData <- subsetted_data[trainIndex,]
+testData <- subsetted_data[-trainIndex,]
 trainData
 ```
 
 ## Exploratory Data Analysis (EDA)
-Now that we have our data set up and split into training and testing, we can do our exploratory data analysis on the variables we are interested in from the introduction that we 
-will use in our predictive models
 
-The first thing we want to explore is the distribution of shares.
 ``` r
 sharesSumm<-trainData %>% 
   summarize("Min"=min(shares),
@@ -64,20 +66,19 @@ sharesSumm<-trainData %>%
             "3rd Quartile"=quantile(shares,0.75),
             "Max"=max(shares)
             )
-knitr ::kable(sharesSumm)
+knitr ::kable(sharesSumm, caption = "5-number summary for number of shares")
 ```
 
 | Min | 1st Quartile | Median | 3rd Quartile |    Max |
 |----:|-------------:|-------:|-------------:|-------:|
 |   4 |          899 |   1300 |         2800 | 843300 |
 
-
-We can clearly see that from th five-number summary of shares for the World channel, on average most shares a little over 1000 as seen by the median.
+5-number summary for number of shares
 
 Let’s start by creating a new factor variable for the training set which
 categorizes shares based on the number of them.
 
-And after creating the new variable, let’s create a contingency table for
+After creating the new variable, let’s create a contingency table for
 it.
 
 ``` r
@@ -112,7 +113,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](WORLDA~1/unnamed-chunk-7-1.png)<!-- -->
+![](WORLDA~1/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 g<-ggplot(data=trainData,aes(x=num_videos, fill=sharecategory))
@@ -124,7 +125,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](WORLDA~1/unnamed-chunk-8-1.png)<!-- -->
+![](WORLDA~1/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 We can inspect the trend of number of images and videos and how it
 affects number of shares. If the tallest and most concentrated chunk of
@@ -168,6 +169,16 @@ knitr ::kable(wordSumm2, caption = "Mean and Standard deviation of average word 
 
 Mean and Standard deviation of average word length by share category
 
+This can better be summarized with the boxplots below
+
+``` r
+g1 <- ggplot(data = trainData, aes(x=sharecategory, y = average_token_length, color = sharecategory))
+g1+geom_boxplot()+
+  labs(title = "boxplots of average word length based on shares category", x = "shares category", y = "average word length")
+```
+
+![](WORLDA~1/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
 Finally, we’ll explore the title polarity vs. the share category.
 
 ``` r
@@ -180,7 +191,7 @@ g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Ti
 
     ## Warning: Removed 2 rows containing missing values (geom_bar).
 
-![](WORLDA~1/unnamed-chunk-11-1.png)<!-- -->
+![](WORLDA~1/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 # Model fitting
 
@@ -303,83 +314,50 @@ So we first set up a list and vectors of our models to store in a
 table/data frame for later when looking at our top candidate
 
 ``` r
-modelList <- list(train1, train2, fitrf, boostFit)
 model_Name <- c("OLS", "Poisson Regression", "Random Forest", "Boosted tree")
-```
 
-Now let’s set up our model comparison functions that automate the
-process.
+train1$results
+train2$results
+fitrf$results
+boostFit$results
+```
 
 ``` r
-RMSEcv <- unlist(
-  sapply(
-    sapply(
-      sapply(modelList, FUN="[", "results"), 
-      FUN=filter, RMSE==min(RMSE)), 
-    FUN="[", "RMSE"
-    )
-)
+pred1 <- predict(train1, newdata = testData)
+OLS <- postResample(pred1, obs = testData$shares)
+pred2 <- predict(train2,newdata = testData)
+Poisson <- postResample(pred2,testData$shares)
+pred3 <- predict(fitrf, newdata = testData)
+Random_Forest <- postResample(pred3, testData$shares)
+pred4 <- predict(boostFit, newdata = testData)
+Boosted_Tree <- postResample(pred4,testData$shares)
 
-MAEcv <- unlist(
-  sapply(
-    sapply(
-      sapply(modelList, FUN="[", "results"), 
-      FUN=filter, MAE==min(MAE)), 
-    FUN="[", "MAE"
-    )
-  )
+resultsdf <- data.frame(OLS,Poisson,Random_Forest,Boosted_Tree)
+resultsdf
+colnames(resultsdf)= model_Name
+results <- as.data.frame(t(resultsdf))
+FinalModel <- results %>% mutate(Model= model_Name) %>% filter(RMSE ==min(RMSE))%>% select(Model,RMSE)
 
-Rsquaredcv <- unlist(
-  sapply(
-    sapply(
-      sapply(modelList, FUN="[", "results"), 
-      FUN=filter, Rsquared==max(Rsquared)), 
-    FUN="[", "Rsquared"
-    )
-  )
 
-# Create a data.frame of model performances.
-cvPerformance <- data.frame(
-  Model=model_Name,
-  RMSE=RMSEcv,
-  Rsq=Rsquaredcv,
-  MAE=MAEcv
-)
-
-# Extract the best model's name and RMSE.
-bestModelCV <- cvPerformance %>%
-  mutate(Model = model_Name) %>%
-  filter(RMSE == min(RMSE)) %>%
-  select(Model, RMSE)
-# Save the model name and RMSE to 2 decimal places as vairables.
-bestModelNameCV <- bestModelCV$Model
-bestRMSECV <- round(bestModelCV$RMSE, 2)
-
-# Display the table in a neat format.
+BestModel <- FinalModel$Model
+BestModelRMSE <- FinalModel$RMSE
 knitr::kable(
-  cvPerformance,
-  digits=2,
-  caption="Table 3: Repeated k-folds CV Performance Summary",
-  col.names=c("", "RMSE", "Rsquared", "MAE")
-)
+  results,
+  digits=3,
+  caption="Testing Set Performance Summary",)
 ```
 
-|                    |     RMSE | Rsquared |     MAE |
-|:-------------------|---------:|---------:|--------:|
-| OLS                | 12346.03 |     0.01 | 3897.97 |
-| Poisson Regression | 12525.12 |     0.01 | 3933.59 |
-| Random Forest      | 13419.19 |     0.00 | 3910.65 |
-| Boosted tree       | 13122.95 |     0.01 | 3911.08 |
+|                    |     RMSE | Rsquared |      MAE |
+|:-------------------|---------:|---------:|---------:|
+| OLS                | 12263.78 |    0.007 | 3932.133 |
+| Poisson Regression | 12393.52 |    0.002 | 3989.780 |
+| Random Forest      | 12496.42 |    0.005 | 3933.689 |
+| Boosted tree       | 12245.18 |    0.009 | 3908.173 |
 
-Table 3: Repeated k-folds CV Performance Summary
+Testing Set Performance Summary
 
-The best performing model in repeated k-folds CV is the Boosted Trees
-with an RMSE of 9697.71 for the training set.
-
-Usually, we would pick the best performing model here to test on the
-testing data, but we will compare them all this time.
-
-Now let’s look at their test set performance.
+The best performing model on the testing set is the Boosted tree with an
+RMSE of 1.2245176^{4}.
 
 ``` r
 evaluatePeformance <- function(model, dataEval, target){
@@ -412,15 +390,3 @@ knitr::kable(
   digits=2,
   caption="Testing Set Performance Summary",)
 ```
-
-|                    |     RMSE | Rsquared |     MAE |
-|:-------------------|---------:|---------:|--------:|
-| OLS                | 12263.78 |     0.01 | 3932.13 |
-| Poisson Regression | 12393.52 |     0.00 | 3989.78 |
-| Random Forest      | 12496.42 |     0.00 | 3933.69 |
-| Boosted tree       | 12245.18 |     0.01 | 3908.17 |
-
-Testing Set Performance Summary
-
-The best performing model on the testing set is the Boosted tree with an
-RMSE of 1.224518^{4}.
