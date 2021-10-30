@@ -3,8 +3,6 @@ Entertainment Analysis
 Brennan Clinch
 10/29/2021
 
-Entertainment Analysis
-
 # Introduction
 
 We are going to analyze the Online News Popularity dataset. It is a
