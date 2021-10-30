@@ -120,7 +120,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](BUSINE~1/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](Business Analysis_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 g<-ggplot(data=trainData,aes(x=num_videos, fill=sharecategory))
@@ -188,7 +188,7 @@ g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Ti
 
     ## Warning: Removed 1 rows containing missing values (geom_bar).
 
-![](BUSINE~2/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](Business Analysis_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 # Model fitting
 
