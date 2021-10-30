@@ -188,7 +188,7 @@ g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Ti
 
     ## Warning: Removed 1 rows containing missing values (geom_bar).
 
-![](ENTERT~2/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](ENTERT~2/unnamed-chunk-14-1.png)<!-- -->
 
 # Model fitting
 
