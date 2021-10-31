@@ -73,7 +73,7 @@ subsetted_data <- automationdata %>% filter(data_channel == params$data_channel)
 
 Let’s now split up our subsetted data sets to training and testing (70/30)
 
-``{r}
+```{r}
 ## Create Training and Test Data Sets
 set.seed(50)
 trainIndex <- createDataPartition(subsetted_data$shares, p = 0.7, list = FALSE)
