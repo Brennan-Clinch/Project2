@@ -1,9 +1,8 @@
 Business Analysis
 ================
-Brennan Clinch
+Brennan Clinch & Allison Warhus
 10/29/2021
 
-Business Analysis
 
 # Introduction
 
@@ -46,7 +45,7 @@ automationdata <- Data %>% mutate(data_channel =   if_else(data_channel_is_lifes
 ## Subset Data for Respective Data Channel
 subsetted_data <- automationdata %>% filter(data_channel == params$data_channel)
 ```
-Let's now split up our subsetted data sets to training and testing (70/30)
+Let's now split up our subsetted data sets to training and testing (70/30).
 ``` r
 ## Create Training and Test Data Sets
 set.seed(50)
@@ -182,7 +181,7 @@ Mean and Standard deviation of average word length by share category
 
 Looking at the summary statistics, the share category that got the lowest mean was 'many', the highest mean was 'few', the lowest standard deviation was 'few', and the highest standard deviation was 'many'.
 
-This can better be summarized with the boxplots below
+This can better be summarized with the boxplots below.
 
 ``` r
 g1 <- ggplot(data = trainData, aes(x=sharecategory, y = average_token_length, color = sharecategory))
@@ -270,7 +269,7 @@ train2 <- train(shares~num_imgs
 
 Our model for the Business channel is lambda(shares) as the response and all interactions of number of images, number of videos, average word length, and title polarity as the predictors.
 
-We will call this model our **Poisson Regression**
+We will call this model our **Poisson Regression**.
 
 
 # Ensemble Methods
@@ -281,7 +280,7 @@ be able for us to easily interpret our predictive models. The two ones
 that we will be using here and the ones that are the most popular are
 boosted trees and random forests. We will be doing a grid search in our
 repeated k-fold cross validations to tune our models for the best
-hyper-parameters
+hyper-parameters.
 
 ## Boosted Tree Model
 
@@ -294,8 +293,8 @@ improve the overall prediction. As this process continues, the model
 gets stronger and stronger.Boosting is particularly robust against
 overfitting.
 
-Here I will do boosting with 5 fold repeated cross validation (3 times).
-I will then print the confusion matrix on the test set.
+Here we will do boosting with 5 fold repeated cross validation (3 times).
+We will then print the confusion matrix on the test set.
 
 ``` r
 ctrl <- trainControl(method="repeatedcv",number=5, repeats = 3)
@@ -334,7 +333,7 @@ fitrf <- train(shares~num_imgs
                 tuneGrid = data.frame(mtry = 1:3))
 ```
 
-Our model here can be called **Random Forest**
+Our model here can be called **Random Forest**.
 
 # Model Comparison
 
