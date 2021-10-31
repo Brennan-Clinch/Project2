@@ -19,7 +19,7 @@ The following packages were required in this project:
 `ggplot2`: A package to build graphs/visuals with
 
 ## Output Files
-[](WorldAnalysis.md)
+[Analysis](WorldAnalysis.md)
 - [](Social Media Analysis.html)
 - The analysis for [entertainment is available here](Entertainment Analysis.html)
 - The analysis for [lifestyle is available here](Lifestyle Analysis.html)
