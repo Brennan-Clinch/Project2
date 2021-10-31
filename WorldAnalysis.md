@@ -1,8 +1,9 @@
-World Analysis
+Project02
 ================
 Brennan Clinch
 10/29/2021
 
+World Analysis
 
 # Introduction
 
@@ -35,6 +36,10 @@ library(tidyverse)
 library(caret)
 ## Read in Raw Data Using Relative Path
 Data <- read_csv("OnlineNewsPopularity.csv") 
+```
+
+``` r
+library(caret)
 ## Create a New Variable to Data Channel to use when automating.
 automationdata <- Data %>% mutate(data_channel =   if_else(data_channel_is_lifestyle == 1, "Lifestyle Analysis",
        if_else(data_channel_is_entertainment == 1, "Entertainment Analysis",
@@ -43,9 +48,6 @@ automationdata <- Data %>% mutate(data_channel =   if_else(data_channel_is_lifes
                               if_else(data_channel_is_tech == 1, "Tech Analysis", "World Analysis"))))))
 ## Subset Data for Respective Data Channel
 subsetted_data <- automationdata %>% filter(data_channel == params$data_channel)
-```
-Let's now split up our subsetted data sets to training and testing (70/30)
-``` r
 ## Create Training and Test Data Sets
 set.seed(500)
 trainIndex <- createDataPartition(subsetted_data$shares, p = 0.7, list = FALSE)
@@ -55,10 +57,6 @@ trainData
 ```
 
 ## Exploratory Data Analysis (EDA)
-
-Now that we have our data split up, we are ready to do exploratory data analysis on all the variables we will be using in our predictive models.
-
-Let us first take a look at shares. We created a new variable `sharesSumm` that provides a 5-number summary of shares for the World channel.
 
 ``` r
 sharesSumm<-trainData %>% 
@@ -77,15 +75,14 @@ knitr ::kable(sharesSumm, caption = "5-number summary for number of shares")
 
 5-number summary for number of shares
 
-Based on the 5-number summary, it does appear our data might be skewed since the Max is way off from the Min, Q1,Median, and Q3. So our median tells us a better estimate on our average number of shares here.
-
-Let’s now create a new factor variable for the training set which
+Let’s start by creating a new factor variable for the training set which
 categorizes shares based on the number of them.
 
-And after creating the new variable, let’s create a contingency table for
+After creating the new variable, let’s create a contingency table for
 it.
 
 ``` r
+library(ggplot2)
 trainData<- trainData %>% 
   mutate(sharecategory = ifelse(shares <1400, "few",
                       ifelse(shares %in% 1400:3800, "some",
@@ -103,8 +100,6 @@ knitr::kable(table(trainData$sharecategory), caption = paste0("contingency table
 
 contingency table for sharecategory
 
-From the table, it appears that for the World channel, most shares were less than 1400 and the least were greater than 3800.
-
 Let’s now create bar plots of the number of images based on the new
 variable which is the category of shares based on the number of them.
 
@@ -118,10 +113,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](WORLDA~1/unnamed-chunk-6-1.png)<!-- -->
-
-
-Looking at the plots, it appears our data is extremely skewed with most of the number of images being equal to zero especially when share category was equal to 'few', so while most images were not a lot and were mostly zero, the less the shares the fewer the number of images for each article in the World channel.
+![](WORLDA~1/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 g<-ggplot(data=trainData,aes(x=num_videos, fill=sharecategory))
@@ -133,7 +125,7 @@ g+geom_bar(position="dodge")+
   theme(legend.position = "None")
 ```
 
-![](WORLDA~1/unnamed-chunk-7-1.png)<!-- -->
+![](WORLDA~1/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 We can inspect the trend of number of images and videos and how it
 affects number of shares. If the tallest and most concentrated chunk of
@@ -143,13 +135,11 @@ are looking at) is related to the number of shares. If each of the three
 graphs looks the same, then we would conclude that images and videos do
 not necessarily impact the number of shares.
 
-We will hypothesize that the shorter the average word length, the more popular
+I hypothesize that the shorter the average word length, the more popular
 a media item will be. So we will analyze word length next. First, let’s
 get the mean and standard deviation of word length in all of the media
 items. Next, we can look at how word length differs based on share
 category.
-
-We will create some short summary statistics about the mean and standard deviation of the average word length as a whole.
 
 ``` r
 wordSumm<-trainData %>% 
@@ -163,10 +153,6 @@ knitr ::kable(wordSumm, caption = "Mean and Standard deviation of average word l
 | 4.496513 |           1.165061 |
 
 Mean and Standard deviation of average word length
-
-From the summary, it appears the mean of average word length for the World channel was 4.50 and the standard deviation was 1.17.
-
-Next we will look at the same summary statistics but now they are based on each share category.
 
 ``` r
 wordSumm2<-trainData %>% group_by(sharecategory) %>%
@@ -183,8 +169,6 @@ knitr ::kable(wordSumm2, caption = "Mean and Standard deviation of average word 
 
 Mean and Standard deviation of average word length by share category
 
-Looking at the summary statistics, the share category that got the lowest mean was 'many', the highest mean was 'few', the lowest standard deviation was 'few', and the highest standard deviation was 'many'.
-
 This can better be summarized with the boxplots below
 
 ``` r
@@ -193,11 +177,9 @@ g1+geom_boxplot()+
   labs(title = "boxplots of average word length based on shares category", x = "shares category", y = "average word length")
 ```
 
-![](WORLDA~1/unnamed-chunk-10-1.png)<!-- -->
+![](WORLDA~1/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
-From the boxplots, it does appear that each boxplot is a little bit symmetrical in distribution by looking at the box part with q1, median, and q3, but it does appear that it may be a bit skewed since we have many outlying values. We can also clearly see that few had the biggest average word length since it has the highest mean and maximum.
-
-Finally, we’ll explore the title polarity vs. the share category using a histogram.
+Finally, we’ll explore the title polarity vs. the share category.
 
 ``` r
 g<-ggplot(data=trainData,aes(title_sentiment_polarity,color=title_sentiment_polarity))
@@ -209,13 +191,9 @@ g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Ti
 
     ## Warning: Removed 2 rows containing missing values (geom_bar).
 
-![](WORLDA~1/unnamed-chunk-11-1.png)<!-- -->
-
-Based on the histograms, it does look like the histograms are a little symmetric (not exactly normal though) with most values of Title Polarity being close to zero. So articles with title polarity close to zero will most likely be shared more often.
+![](WORLDA~1/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 # Model fitting
-
-Now that we have done basic EDA on our data and variables we are analyzing, we are ready to start doing our predictive modeling.
 
 ## Linear Models
 
@@ -244,8 +222,6 @@ train1<-train(shares~num_imgs
               preProcess=c("center","scale"),
               trControl=trainControl(method="cv",number=10))
 ```
-Our model for the World channel is (shares\~num\_imgs*num\_videos*average\_token\_length\*title\_sentiment\_polarity)
-We will call this model **OLS**
 
 ### Model 2: Poisson Regression model (GLM)
 
@@ -255,10 +231,10 @@ the previous variables for all the interaction terms. We can use poisson
 here since these come from all news articles coming from a 2 year period
 which is a fixed amount of time.
 
-Our model for the World Channel is (lambda(shares)\~num\_imgs
+Our model for the tech channel is (lambda(shares)\~num\_imgs
 *num\_videos*average\_token\_length\*title\_sentiment\_polarity)
 
-We will call this model **Poisson**
+We will call this model our **Poisson Model**
 
 ``` r
 train2 <- train(shares~num_imgs
@@ -280,7 +256,7 @@ be able for us to easily interpret our predictive models. The two ones
 that we will be using here and the ones that are the most popular are
 boosted trees and random forests. We will be doing a grid search in our
 repeated k-fold cross validations to tune our models for the best
-hyper-parameters.
+hyper-parameters
 
 ## Boosted Tree Model
 
@@ -293,7 +269,7 @@ improve the overall prediction. As this process continues, the model
 gets stronger and stronger.Boosting is particularly robust against
 overfitting.
 
-Here we will do boosting with 5 fold repeated cross validation (3 times).
+Here I will do boosting with 5 fold repeated cross validation (3 times).
 I will then print the confusion matrix on the test set.
 
 ``` r
@@ -310,7 +286,6 @@ boostFit <- train(shares~num_imgs
                               interaction.depth = c(1:4),
                               n.minobsinnode = 10))
 ```
-Our model here is **Boosted tree**
 
 ## Random Forest
 
@@ -321,16 +296,12 @@ independently of one another while also being averaged. Averaging the
 trees along with letting the trees grow independently can lower our
 variance we are using for prediction.
 
-So let's set up our random forest using repeated 5-fold cross validation with mtry being 1,2,3.
-
 ``` r
 fitrf <- train(shares~num_imgs*num_videos*average_token_length*title_sentiment_polarity,method = "rf",data = trainData,
              trControl = ctrl, 
              metric = "RMSE",
              tuneGrid = data.frame(mtry = 1:3))
 ```
-
-So our model here is **Random Forest**
 
 # Model Comparison
 
@@ -344,8 +315,13 @@ table/data frame for later when looking at our top candidate
 
 ``` r
 model_Name <- c("OLS", "Poisson Regression", "Random Forest", "Boosted tree")
+
+train1$results
+train2$results
+fitrf$results
+boostFit$results
 ```
-Now let's use our models on the testing set and see how well they do to pick our best model for the World channel.
+
 ``` r
 pred1 <- predict(train1, newdata = testData)
 OLS <- postResample(pred1, obs = testData$shares)
@@ -382,3 +358,35 @@ Testing Set Performance Summary
 
 The best performing model on the testing set is the Boosted tree with an
 RMSE of 1.2245176^{4}.
+
+``` r
+evaluatePeformance <- function(model, dataEval, target){
+  ###
+  # This function takes in a fit model, testing data (tibble), and a target
+  # variable (string) and returns the performance.
+  ###
+  preds <- predict(model, newdata=dataEval)
+  return(postResample(preds, pull(dataEval, target)))
+}
+# Get the test set performances.
+testPerformances <- sapply(
+  modelList, FUN=evaluatePeformance, dataEval=testData, target="shares"
+  )
+# Rename the columns with the model names.
+colnames(testPerformances) <- model_Name
+# Convert the table to data.frame.
+testPerformances <- as.data.frame(t(testPerformances))
+# Extract the best model's name and RMSE.
+bestModel <- testPerformances %>%
+  mutate(Model = model_Name) %>%
+  filter(RMSE == min(RMSE)) %>%
+  select(Model, RMSE)
+# Save the model name and RMSE to 2 decimal places as variables.
+bestModelName <- bestModel$Model
+bestRMSE <- round(bestModel$RMSE, 2)
+# Display the table in a neat format.
+knitr::kable(
+  testPerformances,
+  digits=2,
+  caption="Testing Set Performance Summary",)
+```
