@@ -3,6 +3,17 @@ Social Media Analysis
 Brennan Clinch & Allison Warhus
 10/29/2021
 
+-   [Introduction](#introduction)
+-   [Import and Subset data](#import-and-subset-data)
+-   [Exploratory Data Analysis (EDA)](#exploratory-data-analysis-eda)
+-   [Model fitting](#model-fitting)
+    -   [Linear Models](#linear-models)
+        -   [Model 1: (OLS)](#model-1-ols)
+        -   [Model 2: Poisson Regression model (GLM)](#model-2-poisson-regression-model-glm)
+-   [Ensemble Methods](#ensemble-methods)
+    -   [Boosted Tree Model](#boosted-tree-model)
+    -   [Random Forest](#random-forest)      
+-   [Model Comparison](#model-comparison)
 
 # Introduction
 
