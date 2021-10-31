@@ -19,12 +19,12 @@ The following packages were required in this project:
 `ggplot2`: A package to build graphs/visuals with
 
 ## Output Files
-- The analysis for [social media is available here](Reports/data_channel_is_socmed.md)
-- The analysis for [entertainment is available here](Reports/data_channel_is_entertainment.md)
-- The analysis for [lifestyle is available here](Reports/data_channel_is_lifestyle.md)
-- The analysis for [business is available here](Reports/data_channel_is_bus.md)
-- The analysis for [world is available here](Reports/data_channel_is_world.md)
-- The analysis for [technology is available here](Reports/data_channel_is_tech.md)
+- The analysis for [social media is available here](Social Media Analysis.html)
+- The analysis for [entertainment is available here](Entertainment Analysis.html)
+- The analysis for [lifestyle is available here](Lifestyle Analysis.html)
+- The analysis for [business is available here](Business Analysis.html)
+- The analysis for [world is available here](World Analysis.html)
+- The analysis for [technology is available here](Tech Analysis.html)
 
 ```{r}
 wordSumm<-data %>% 
