@@ -29,27 +29,16 @@ The following packages were required in this project:
 
 ## Automation from Markdown
 
-```{r,eval = FALSE}
-
-library(tidyverse)
+``` r 
+channelID <- unique(automationdata$data_channel)
+output_file <- paste0(channelID, ".md")
+params = lapply(channelID, FUN = function(x){list(data_channel = x)})
+reports <- tibble(output_file, params)
 library(rmarkdown)
-channelID<-list("data_channel_is_lifestyle",
-             "data_channel_is_entertainment",
-             "data_channel_is_bus",
-             "data_channel_is_socmed",
-             "data_channel_is_tech",
-             "data_channel_is_world")
-
-for (channel in c(0,1,2,3,4,5,6)){
-  rmarkdown::render(
-    "Project_2.Rmd",
-    output_file=paste0( channelID[[channel+1]]),
-    params = list(
-    channel = channel,
-    name = channelID[[channel+1]]
-    )
-  )
-}
+apply(reports, MARGIN = 1, 
+            FUN = function(x){
+                render(input = "Project02.Rmd", output_file = x[[1]], params = x[[2]])
+                })
 ```
 
 
