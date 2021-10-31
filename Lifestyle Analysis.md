@@ -141,7 +141,7 @@ g+geom_bar(position="dodge")+
 
 ![](LIFEST~2/unnamed-chunk-7-1.png)<!-- -->
 
-Looking at the plots, it appears our data is extremely skewed with most of the number of videos being equal to zero especially when share category was equal to 'some', so while most videos were not a lot and were mostly zero, the more average the shares the fewer the number of videos for each article in the Entertainment channel. It can also be noted that it is almost true for the fewer the number of shares as well.
+Looking at the plots, it appears our data is extremely skewed with most of the number of videos being equal to zero especially when share category was equal to 'some', so while most videos were not a lot and were mostly zero, the more average the shares the fewer the number of videos for each article in the Lifestyle channel. It can also be noted that it is almost true for the fewer the number of shares as well.
 
 We can inspect the trend of number of images and videos and how it
 affects number of shares. If the tallest and most concentrated chunk of
