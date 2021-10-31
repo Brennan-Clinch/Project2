@@ -20,14 +20,16 @@ The following packages were required in this project:
 
 ## Output Files
 - The analysis for [social media is available here](https://Brennan-Clinch.github.io/Project2/Social%20Media%20Analysis.html)
-- The analysis for [entertainment is available here](Entertainment Analysis.html)
-- The analysis for [lifestyle is available here](Lifestyle Analysis.html)
-- The analysis for [business is available here](Business Analysis.html)
-- The analysis for [world is available here](WorldAnalysis.md)
-- The analysis for [technology is available here](Tech Analysis.html)
+- The analysis for [entertainment is available here](https://Brennan-Clinch.github.io/Project2/Entertainment%20Analysis.html)
+- The analysis for [lifestyle is available here](https://Brennan-Clinch.github.io/Project2/Lifestyle%20Analysis.html)
+- The analysis for [business is available here](https://Brennan-Clinch.github.io/Project2/Business%20Analysis.html)
+- The analysis for [world is available here](https://Brennan-Clinch.github.io/Project2/World%20Analysis.html)
+- The analysis for [technology is available here](https://Brennan-Clinch.github.io/Project2/Tech%20Analysis.html)
 
 
 ## Automation from Markdown
+
+We used this R code to render and automate all our analysis files for each data channel.
 
 ``` r 
 channelID <- unique(automationdata$data_channel)
