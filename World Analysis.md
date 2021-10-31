@@ -98,10 +98,10 @@ it.
 
 ``` r
 trainData<- trainData %>% 
-  mutate(sharecategory = ifelse(shares <quantile(shares,0.25), "few",
-                      ifelse(shares %in% quantile(shares(0.25):quantile(shares,0.75), "some",
+  mutate(sharecategory = ifelse(shares < 1400, "few",
+                      ifelse(shares %in% 1400:3800, "some",
                              "many")))
-testData <- testData %>% mutate(sharecategory = ifelse(shares <(shares,0.25), "few",ifelse(shares %in% (shares(0.25):quantile(shares,0.75), "some",
+testData <- testData %>% mutate(sharecategory = ifelse(shares < 1400, "few",ifelse(shares %in% 1400:3800, "some",
                              "many")))
 knitr::kable(table(trainData$sharecategory), caption = paste0("contingency table for sharecategory"))
 ```
