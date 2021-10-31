@@ -23,7 +23,7 @@ The following packages were required in this project:
 - The analysis for [entertainment is available here](Entertainment Analysis.html)
 - The analysis for [lifestyle is available here](Lifestyle Analysis.html)
 - The analysis for [business is available here](Business Analysis.html)
-- The analysis for [world is available here](World Analysis.html)
+- The analysis for [world is available here](WorldAnalysis.html)
 - The analysis for [technology is available here](Tech Analysis.html)
 
 
