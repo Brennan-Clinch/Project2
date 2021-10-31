@@ -1,6 +1,6 @@
 Entertainment Analysis
 ================
-Brennan Clinch
+Brennan Clinch & Allison Warhus
 10/29/2021
 
 # Introduction
@@ -43,7 +43,7 @@ automationdata <- Data %>% mutate(data_channel =   if_else(data_channel_is_lifes
 ## Subset Data for Respective Data Channel
 subsetted_data <- automationdata %>% filter(data_channel == params$data_channel)
 ```
-Let's now split up our subsetted data sets to training and testing (70/30)
+Let's now split up our subsetted data sets to training and testing (70/30).
 ``` r
 ## Create Training and Test Data Sets
 set.seed(50)
@@ -245,7 +245,7 @@ train1<-train(shares~num_imgs
               preProcess=c("center","scale"),
               trControl=trainControl(method="cv",number=10))
 ```
-Our model for the Entertainment channel using OLS is a linear model with shares as the response and all interactions between number of images, number of videos, average token length, and title polarity as the predictors. We can call this model our OLS.
+Our model for the Entertainment channel using OLS is a linear model with shares as the response and all interactions between number of images, number of videos, average token length, and title polarity as the predictors. We can call this model our **OLS**.
 
 ### Model 2: Poisson Regression model (GLM)
 
@@ -271,7 +271,7 @@ train2 <- train(shares~num_imgs
 
 Our model for the Business channel is lambda(shares) as the response and all interactions of number of images, number of videos, average word length, and title polarity as the predictors.
 
-We will call this model our **Poisson Regression**
+We will call this model our **Poisson Regression**.
 
 # Ensemble Methods
 
@@ -294,7 +294,7 @@ improve the overall prediction. As this process continues, the model
 gets stronger and stronger.Boosting is particularly robust against
 overfitting.
 
-Here I will do boosting with 5 fold repeated cross validation (3 times).
+Here we will do boosting with 5 fold repeated cross validation (3 times).
 I will then print the confusion matrix on the test set.
 
 ``` r
@@ -312,7 +312,7 @@ boostFit <- train(shares~num_imgs
                               n.minobsinnode = 10))
 ```
 
-Our model here can be called **Boosted tree**
+Our model here can be called **Boosted tree**.
 
 ## Random Forest
 
@@ -330,7 +330,7 @@ fitrf <- train(shares~num_imgs*num_videos*average_token_length*title_sentiment_p
              tuneGrid = data.frame(mtry = 1:3))
 ```
 
-Our model here can be called **Random Forest**
+Our model here can be called **Random Forest**.
 
 # Model Comparison
 
