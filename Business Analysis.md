@@ -3,6 +3,18 @@ Business Analysis
 Brennan Clinch & Allison Warhus
 10/29/2021
 
+-   [Introduction](#introduction)
+-   [Import and Subset data](#import-and-subset-data)
+-   [Exploratory Data Analysis (EDA)](#exploratory-data-analysis-eda)
+-   [Model fitting](#model-fitting)
+    -   [Linear Models](#linear-models)
+        -   [Model 1: (OLS)](#model-1-ols)
+        -   [Model 2: Poisson Regression model (GLM)](#model-2-poisson-regression-model-glm)
+-   [Ensemble Methods](#ensemble-methods)
+    -   [Boosted Tree Model](#boosted-tree-model)
+    -   [Random Forest](#random-forest)      
+-   [Model Comparison](#model-comparison)
+
 
 # Introduction
 
@@ -54,7 +66,7 @@ trainData <- subsetted_data[trainIndex,]
 testData <- subsetted_data[-trainIndex,]
 ```
 
-## Exploratory Data Analysis (EDA)
+# Exploratory Data Analysis (EDA)
 Now that we have our data split up, we are ready to do exploratory data analysis on all the variables we will be using in our predictive models.
 
 Let us first take a look at shares. We created a new variable sharesSumm that provides a 5-number summary of shares for the Business channel.
