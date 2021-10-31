@@ -6,7 +6,6 @@ output: github_document
 params:
   data_channel: "params$data_channel"
 ---
-`r params$data_channel`
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -60,12 +59,7 @@ apply(reports, MARGIN = 1,
 library(tidyverse)
 library(caret)
 ## Read in Raw Data Using Relative Path
-Data <- read_csv("OnlineNewsPopularity.csv") 
-```
-
-   
-
-```{r}
+Data <- read_csv("OnlineNewsPopularity.csv")
 library(caret)
 ## Create a New Variable to Data Channel to use when automating.
 automationdata <- Data %>% mutate(data_channel =   if_else(data_channel_is_lifestyle == 1, "Lifestyle Analysis",
@@ -75,21 +69,23 @@ automationdata <- Data %>% mutate(data_channel =   if_else(data_channel_is_lifes
                               if_else(data_channel_is_tech == 1, "Tech Analysis", "World Analysis"))))))
 ## Subset Data for Respective Data Channel
 subsetted_data <- automationdata %>% filter(data_channel == params$data_channel)
+```
+
+Let’s now split up our subsetted data sets to training and testing (70/30)
+
+``{r}
 ## Create Training and Test Data Sets
-set.seed(500)
+set.seed(50)
 trainIndex <- createDataPartition(subsetted_data$shares, p = 0.7, list = FALSE)
 trainData <- subsetted_data[trainIndex,]
 testData <- subsetted_data[-trainIndex,]
 trainData
 ```
 
-    
-
 
 ## Exploratory Data Analysis (EDA)
 
-
-    
+Now that we have our data split up, we are ready to do exploratory data analysis on all the variables we will be using in our predictive models.
 
 ```{r}
 sharesSumm<-trainData %>% 
@@ -102,12 +98,11 @@ sharesSumm<-trainData %>%
 knitr ::kable(sharesSumm, caption = "5-number summary for number of shares")
 ```
 
-Let's start by creating a new factor variable for the training set which categorizes shares based on the number of them. 
+Let's create a new factor variable for the training set which categorizes shares based on the number of them. 
 
 After creating the new variable, let's create a contingency table for it.
 
 ``` {r}
-library(ggplot2)
 trainData<- trainData %>% 
   mutate(sharecategory = ifelse(shares <1400, "few",
                       ifelse(shares %in% 1400:3800, "some",
@@ -118,7 +113,7 @@ knitr::kable(table(trainData$sharecategory), caption = paste0("contingency table
 ```
 
 
-Let's now create bar plots of the number of images based on the new variable which is the category of shares based on the number of them.
+Let’s now create bar plots of the number of images and the number of videos based on the new variable which is the category of shares based on the number of them.
 
 ```{r}
 g<-ggplot(data=trainData,aes(x=num_imgs,fill=sharecategory))
@@ -129,9 +124,6 @@ g+geom_bar(position="dodge")+
   facet_wrap(~sharecategory)+
   theme(legend.position = "None")
 ```
-
-
-
 
 
 
@@ -155,7 +147,7 @@ are looking at) is related to the number of shares. If each of the three
 graphs looks the same, then we would conclude that images and videos do
 not necessarily impact the number of shares.
 
-I hypothesize that the shorter the average word length, the more popular
+We will hypothesize that the shorter the average word length, the more popular
 a media item will be. So we will analyze word length next. First, let’s
 get the mean and standard deviation of word length in all of the media
 items. Next, we can look at how word length differs based on share
@@ -168,7 +160,7 @@ wordSumm<-trainData %>%
 knitr ::kable(wordSumm, caption = "Mean and Standard deviation of average word length")
 ```
 
-
+We will look at the same summary statistics but now they are based on each share category.
 
 ```{r}
 wordSumm2<-trainData %>% group_by(sharecategory) %>%
@@ -186,7 +178,7 @@ g1+geom_boxplot()+
 ```
 
 
-Finally, we’ll explore the title polarity vs. the share category.
+Finally, we’ll explore the title polarity vs. the share category using a histogram.
 
 ```{r}
 g<-ggplot(data=trainData,aes(title_sentiment_polarity,color=title_sentiment_polarity))
@@ -196,6 +188,8 @@ g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Ti
  
 
 # Model fitting
+
+Now that we have done basic EDA on our data and variables we are analyzing, we are ready to start doing our predictive modeling.
 
 ## Linear Models
 
@@ -225,6 +219,7 @@ train1<-train(shares~num_imgs
               trControl=trainControl(method="cv",number=10))
 ```
 
+
 ### Model 2: Poisson Regression model (GLM)
 
 The second model we will be creating is a poisson regression model which
@@ -233,10 +228,6 @@ the previous variables for all the interaction terms. We can use poisson
 here since these come from all news articles coming from a 2 year period
 which is a fixed amount of time.
 
-Our model for the tech channel is (lambda(shares)~num_imgs
-*num_videos*average_token_length*title_sentiment_polarity)
-
-We will call this model our **Poisson Model**
 
 ``` {r}
 train2 <- train(shares~num_imgs
@@ -288,6 +279,7 @@ boostFit <- train(shares~num_imgs
                               interaction.depth = c(1:4),
                               n.minobsinnode = 10))
 ```
+Our model here will be called **Boosted tree**
 
 ## Random Forest
 
@@ -299,33 +291,29 @@ trees along with letting the trees grow independently can lower our
 variance we are using for prediction.
 
 ```{r, cache = T}
-fitrf <- train(shares~num_imgs*num_videos*average_token_length*title_sentiment_polarity,method = "rf",data = trainData,
-             trControl = ctrl, 
-             metric = "RMSE",
-             tuneGrid = data.frame(mtry = 1:3))
+fitrf <- train(shares~num_imgs
+               *num_videos
+               *average_token_length
+               *title_sentiment_polarity,
+               method = "rf",
+               data = trainData,
+               trControl = ctrl, 
+               metric = "RMSE",
+               tuneGrid = data.frame(mtry = 1:3))
 ```
+Our model here can be called **Random Forest**.
 
 # Model Comparison
 
-With the repeated k-folds CV completed and our models fit, we can
-evaluate their performance in CV and on the withheld testing set.
+With the repeated k-folds CV completed and our models fit, we can evaluate their performance on the withheld testing set.
 
-Let’s evaluate their repeated k-folds CV performance first
-
-So we first set up a list and vectors of our models to store in a table/data frame for later when looking at our top candidate
+So we first set up a list and vectors of our models to store in a table/data frame for later when looking at our top candidate.
 
 ```{r}
 model_Name <- c("OLS", "Poisson Regression", "Random Forest", "Boosted tree")
-
-train1$results
-train2$results
-fitrf$results
-boostFit$results
 ```
 
-
-
-
+Now let’s use our models on the testing set and see how well they do to pick our best model for the Entertainment channel.
 
 ```{r}
 pred1 <- predict(train1, newdata = testData)
