@@ -113,7 +113,7 @@ knitr::kable(table(trainData$sharecategory), caption = paste0("contingency table
 
 contingency table for sharecategory
 
-From the table, it appears that for the Business channel, most shares were greater than the third quantile and the least were greater than the first quantile for the Business channel with no shares in between the first and third quantiles.
+From the table, it appears that for the Business channel, most shares were greater than the third quantile and the least were greater than the first quartile for the Business channel with no shares in between the first and third quartiles.
 
 Let’s now create bar plots of the number of images based on the new variable which is the category of shares based on the number of them.
 
