@@ -99,10 +99,10 @@ it.
 ``` r
 library(ggplot2)
 trainData<- trainData %>% 
-  mutate(sharecategory = ifelse(shares < 1400, "few",
-                      ifelse(shares %in% 1400:3800, "some",
+  mutate(sharecategory = ifelse(shares <quantile(shares,0.25), "few",
+                      ifelse(shares %in% quantile(shares,0.25):quantile(shares,0.75), "some",
                              "many")))
-testData <- testData %>% mutate(sharecategory = ifelse(shares <1400, "few",ifelse(shares %in% 1400:3800, "some",
+testData <- testData %>% mutate(sharecategory = ifelse(shares <quantile(shares,0.25), "few",ifelse(shares %in% quantile(shares,0.25):quantile(shares,0.75), "some",
                              "many")))
 knitr::kable(table(trainData$sharecategory), caption = paste0("contingency table for sharecategory"))
 ```
@@ -115,7 +115,7 @@ knitr::kable(table(trainData$sharecategory), caption = paste0("contingency table
 
 contingency table for sharecategory
 
-From the table, it appears that for the Social Media channel, most shares were between 1400 and 3800 and the least were less than 1400.
+From the table, it appears that for the Social Media channel, most shares were between the first and third quartile and the least were less than the first quartile.
 
 Let’s now create bar plots of the number of images and the number of videos based on the new variable which is the category of shares based on the number of them.
 
@@ -191,7 +191,7 @@ knitr ::kable(wordSumm2, caption = "Mean and Standard deviation of average word 
 
 Mean and Standard deviation of average word length by share category
 
-Looking at the summary statistics, the share category that got the lowest mean was 'few', the highest mean was 'some', the lowest standard deviation was 'some', and the highest standard deviation was 'few'.
+Looking at the summary statistics, the share category that got the lowest mean was 'many', the highest mean was 'some', the lowest standard deviation was 'some', and the highest standard deviation was 'few'.
 
 This can better be summarized with the boxplots below
 
@@ -217,7 +217,7 @@ g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Ti
 
 ![](SOCIAL~2/unnamed-chunk-11-1.png)<!-- -->
 
-Based on the histograms, it does look like the histograms are a little symmetric (not exactly normal though) with most values of Title Polarity being close to zero. The share category that had the most frequency of being close to zero was some. So articles with title polarity close to zero and having shares that are 1400 to 3800 will most likely be shared more often.
+Based on the histograms, it does look like the histograms are a little symmetric (not exactly normal though) with most values of Title Polarity being close to zero. The share category that had the most frequency of being close to zero was some. So articles with title polarity close to zero and having shares that are between first and third quartile of the data will most likely be shared more often.
 
 # Model fitting
 
