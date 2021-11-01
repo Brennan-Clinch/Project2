@@ -222,7 +222,7 @@ g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Ti
 
     ## Warning: Removed 1 rows containing missing values (geom_bar).
 
-![](ENTERT~2/unnamed-chunk-12-1.png)<!-- -->
+![](ENTERT~2/unnamed-chunk-14-1.png)<!-- -->
 
 Based on the histograms, it does look like the histograms are a little symmetric (not exactly normal though) with most values of Title Polarity being close to zero. The share category that had the most frequency of being close to zero was `few`. So articles with title polarity close to zero and having shares that are less than the first quartile will most likely be shared more often. Articles with title polarity close to zero and shares between the first and third quartile come close as well.
 
