@@ -103,15 +103,16 @@ testData <- testData %>% mutate(sharecategory = ifelse(shares <1400, "few",ifels
 knitr::kable(table(trainData$sharecategory), caption = paste0("contingency table for sharecategory"))
 ```
 
+
 | Var1 | Freq |
 |:-----|-----:|
-| few  |  573 |
-| many |  307 |
-| some |  592 |
+| few  |  338 |
+| many |  368 |
+| some |  766 |
 
 contingency table for sharecategory
 
-From the table, it appears that for the Lifestyle channel, most shares were between 1400 and 3800 and the least were greater than 3800.
+From the table, it appears that for the Lifestyle channel, most shares were between the first and third quartile and the least were less than the first quartile.
 
 Let’s now create bar plots of the number of images and the number of videos based on the new variable which is the category of shares based on the number of them.
 
@@ -127,7 +128,7 @@ g+geom_bar(position="dodge")+
 
 ![](LIFEST~2/unnamed-chunk-6-1.png)<!-- -->
 
-Looking at the plots, it appears our data is extremely skewed with most of the number of images being equal to zero especially when share category was equal to 'few', so while most images were not a lot and were mostly zero, the less the shares the fewer the number of images for each article in the Lifestyle channel.
+Looking at the plots, it appears our data is extremely skewed with most of the number of images being equal to zero especially when share category was equal to 'some', so while most images were not a lot and were mostly zero, the more average the shares the fewer the number of images for each article in the Lifestyle channel.
 
 ``` r
 g<-ggplot(data=trainData,aes(x=num_videos, fill=sharecategory))
@@ -141,7 +142,7 @@ g+geom_bar(position="dodge")+
 
 ![](LIFEST~2/unnamed-chunk-7-1.png)<!-- -->
 
-Looking at the plots, it appears our data is extremely skewed with most of the number of videos being equal to zero especially when share category was equal to 'some', so while most videos were not a lot and were mostly zero, the more average the shares the fewer the number of videos for each article in the Lifestyle channel. It can also be noted that it is almost true for the fewer the number of shares as well.
+Looking at the plots, it appears our data is extremely skewed with most of the number of videos being equal to zero especially when share category was equal to 'some', so while most videos were not a lot and were mostly zero, the more average the shares the fewer the number of videos for each article in the Lifestyle channel.
 
 We can inspect the trend of number of images and videos and how it
 affects number of shares. If the tallest and most concentrated chunk of
@@ -183,13 +184,13 @@ knitr ::kable(wordSumm2, caption = "Mean and Standard deviation of average word 
 
 | sharecategory |     Mean | Standard Deviation |
 |:--------------|---------:|-------------------:|
-| few           | 4.619062 |          0.3326114 |
-| many          | 4.480556 |          0.8653504 |
-| some          | 4.614627 |          0.5405005 |
+| few           | 4.628291 |          0.2705660 |
+| many          | 4.506519 |          0.8027016 |
+| some          | 4.610118 |          0.5177738 |
 
 Mean and Standard deviation of average word length by share category
 
-Looking at the summary statistics, the share category that got the lowest mean was 'many', the highest mean was 'few', the lowest standard deviation was 'few', and the highest standard deviation was 'many'. This time 'some' and 'few' had close to the same mean.
+Looking at the summary statistics, the share category that got the lowest mean was 'many', the highest mean was 'few', the lowest standard deviation was 'few', and the highest standard deviation was 'many'. 
 
 This can better be summarized with the boxplots below
 
@@ -201,7 +202,7 @@ g1+geom_boxplot()+
 
 ![](LIFEST~2/unnamed-chunk-10-1.png)<!-- -->
 
-From the boxplots, it does appear that each boxplot is a little bit symmetrical in distribution by looking at the box part with q1, median, and q3, but it does appear that it may be a bit skewed since we have many outlying values. We can also clearly see that `some` had the biggest average word length since it has the highest maximum.
+From the boxplots, it does appear that each boxplot is a little bit symmetrical in distribution by looking at the box part with q1, median, and q3, but it does appear that it may be a bit skewed since we have many outlying values. We can also clearly see that `few` had the biggest average word length and 'many' had the highest maximum.
 
 Finally, we’ll explore the title polarity vs. the share category using a histogram.
 
@@ -215,7 +216,7 @@ g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Ti
 
 ![](LIFEST~2/unnamed-chunk-11-1.png)<!-- -->
 
-Based on the histograms, it does look like the histograms are a little symmetric (not exactly normal though) with most values of Title Polarity being close to zero. The share category that had the most frequency of being close to zero was some. So articles with title polarity close to zero and having shares that are 1400 to 3800 will most likely be shared more often.
+Based on the histograms, it does look like the histograms are a little symmetric (not exactly normal though) with most values of Title Polarity being close to zero. The share category that had the most frequency of being close to zero was some. So articles with title polarity close to zero and having shares that are between the first and third quartile of the data will most likely be shared more often.
 
 # Model fitting
 
