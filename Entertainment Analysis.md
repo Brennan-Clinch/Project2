@@ -99,23 +99,23 @@ it.
 ``` r
 library(ggplot2)
 trainData<- trainData %>% 
-  mutate(sharecategory = ifelse(shares < 1400, "few",
-                      ifelse(shares %in% 1400:3800, "some",
+  mutate(sharecategory = ifelse(shares <quantile(shares,0.25), "few",
+                      ifelse(shares %in% quantile(shares,0.25):quantile(shares,0.75), "some",
                              "many")))
-testData <- testData %>% mutate(sharecategory = ifelse(shares <1400, "few",ifelse(shares %in% 1400:3800, "some",
+testData <- testData %>% mutate(sharecategory = ifelse(shares <quantile(shares,0.25), "few",ifelse(shares %in% quantile(shares,0.25):quantile(shares,0.75), "some",
                              "many")))
 knitr::kable(table(trainData$sharecategory), caption = paste0("contingency table for sharecategory"))
 ```
 
 | Var1 | Freq |
 |:-----|-----:|
-| few  | 2922 |
-| many |  692 |
-| some | 1327 |
+| few  | 1233 |
+| many | 1216 |
+| some | 2492 |
 
 contingency table for sharecategory
 
-From the table, it appears that for the World channel, most shares were less than 1400 and the least were greater than 3800.
+From the table, it appears that for the World channel, most shares were between the first and third quartile of the data and the least were greater than the third quartile.
 
 Let’s now create bar plots of the number of images and the number of videos based on the new
 variable which is the category of shares based on the number of them.
@@ -132,7 +132,7 @@ g+geom_bar(position="dodge")+
 
 ![](ENTERT~2/unnamed-chunk-7-1.png)<!-- -->
 
-Looking at the plots, it appears our data is extremely skewed with most of the number of images being equal to zero especially when share category was equal to 'few', so while most images were not a lot and were mostly zero, the less the shares the fewer the number of images for each article in the Entertainment channel.
+Looking at the plots, it appears our data is extremely skewed with most of the number of images being equal to zero especially when share category was equal to 'some', so while most images were not a lot and were mostly zero, the more average the shares the fewer the number of images for each article in the Entertainment channel.
 
 ``` r
 g<-ggplot(data=trainData,aes(x=num_videos, fill=sharecategory))
@@ -146,7 +146,7 @@ g+geom_bar(position="dodge")+
 
 ![](ENTERT~2/unnamed-chunk-8-1.png)<!-- -->
 
-Looking at the plots, it appears again that our data is extremely skewed with most of the number of videos being equal to zero especially when share category was equal to 'few', so while most videos were not a lot and were mostly zero, the less the shares the fewer the number of videos for each article in the World channel.
+Looking at the plots, it appears again that our data is extremely skewed with most of the number of videos being equal to zero especially when share category was equal to 'some', so while most videos were not a lot and were mostly zero, the more average the shares the fewer the number of videos for each article in the World channel.
 
 
 We can inspect the trend of number of images and videos and how it
@@ -189,13 +189,13 @@ knitr ::kable(wordSumm2, caption = "Mean and Standard deviation of average word 
 
 | sharecategory |     Mean | Standard Deviation |
 |:--------------|---------:|-------------------:|
-| few           | 4.482672 |          0.7698444 |
-| many          | 4.450798 |          0.9236812 |
-| some          | 4.456219 |          0.8552159 |
+| few           | 4.458071 |          0.8313591 |
+| many          | 4.467243 |          0.8566742 |
+| some          | 4.479436 |          0.7882945 |
 
 Mean and Standard deviation of average word length by share category
 
-Looking at the summary statistics, the share category that got the lowest mean was 'many', the highest mean was 'few', the lowest standard deviation was 'few', and the highest standard deviation was 'many'. This time 'some' and 'many' had close to the same mean.
+Looking at the summary statistics, the share category that got the lowest mean was 'few', the highest mean was 'some', the lowest standard deviation was 'some', and the highest standard deviation was 'few'. 
 
 This can better be summarized with the boxplots below
 
@@ -207,7 +207,7 @@ g1+geom_boxplot()+
 
 ![](ENTERT~2/unnamed-chunk-11-1.png)<!-- -->
 
-From the boxplots, it does appear that each boxplot is a little bit symmetrical in distribution by looking at the box part with q1, median, and q3, but it does appear that it may be a bit skewed since we have many outlying values. We can also clearly see that few had the biggest average word length since it has the highest mean and maximum.
+From the boxplots, it does appear that each boxplot is a little bit symmetrical in distribution by looking at the box part with q1, median, and q3, but it does appear that it may be a bit skewed since we have many outlying values. We can also clearly see that some had the biggest average word length and many had the biggest maximum.
 
 Finally, we’ll explore the title polarity vs. the share category using a histogram.
 
@@ -224,7 +224,7 @@ g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Ti
 
 ![](ENTERT~2/unnamed-chunk-12-1.png)<!-- -->
 
-Based on the histograms, it does look like the histograms are a little symmetric (not exactly normal though) with most values of Title Polarity being close to zero. The share category that had the most frequency of being close to zero was `some`. So articles with title polarity close to zero and having shares that are 1400 to 3800 will most likely be shared more often.
+Based on the histograms, it does look like the histograms are a little symmetric (not exactly normal though) with most values of Title Polarity being close to zero. The share category that had the most frequency of being close to zero was `few`. So articles with title polarity close to zero and having shares that are less than the first quartile will most likely be shared more often. Articles with title polarity close to zero and shares between the first and third quartile come close as well.
 
 # Model fitting
 
