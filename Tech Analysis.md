@@ -99,23 +99,23 @@ After creating the new variable, let’s create a contingency table for it.
 ``` r
 library(ggplot2)
 trainData<- trainData %>% 
-  mutate(sharecategory = ifelse(shares < 1400, "few",
-                      ifelse(shares %in% 1400:3800, "some",
+  mutate(sharecategory = ifelse(shares <quantile(shares,0.25), "few",
+                      ifelse(shares %in% quantile(shares,0.25):quantile(shares,0.75), "some",
                              "many")))
-testData <- testData %>% mutate(sharecategory = ifelse(shares <1400, "few",ifelse(shares %in% 1400:3800, "some",
+testData <- testData %>% mutate(sharecategory = ifelse(shares <quantile(shares,0.25), "few",ifelse(shares %in% quantile(shares,0.25):quantile(shares,0.75), "some",
                              "many")))
 knitr::kable(table(trainData$sharecategory), caption = paste0("contingency table for sharecategory"))
 ```
 
 | Var1 | Freq |
 |:-----|-----:|
-| few  | 1837 |
-| many |  929 |
-| some | 2379 |
+| few  | 1082 |
+| many | 1263 |
+| some | 2800 |
 
 contingency table for sharecategory
 
-From the table, it appears that for the Technology channel, most shares were between 1400 and 3800 and the least were greater than 3800.
+From the table, it appears that for the Technology channel, most shares were between the first and third quartile of the data and the least were less than the first quartile.
 
 Let’s now create bar plots of the number of images and the number of videos based on the new variable which is the category of shares based on the number of them.
 
@@ -185,13 +185,13 @@ knitr ::kable(wordSumm2, caption = "Mean and Standard deviation of average word 
 
 | sharecategory |     Mean | Standard Deviation |
 |:--------------|---------:|-------------------:|
-| few           | 4.588598 |          0.2999857 |
-| many          | 4.564346 |          0.4664693 |
-| some          | 4.584304 |          0.3517432 |
+| few           | 4.580750 |          0.3248946 |
+| many          | 4.572583 |          0.4384331 |
+| some          | 4.587160 |          0.3300299 |
 
 Mean and Standard deviation of average word length by share category
 
-Looking at the summary statistics, the share category that got the lowest mean was 'many', the highest mean was 'few', the lowest standard deviation was 'few', and the highest standard deviation was 'many'. It also can be noted that share categories 'few' and 'some' had close to the same means.
+Looking at the summary statistics, the share category that got the lowest mean was 'many', the highest mean was 'some', the lowest standard deviation was 'few', and the highest standard deviation was 'many'. 
 
 This can better be summarized with the boxplots below
 
@@ -203,7 +203,7 @@ g1+geom_boxplot()+
 
 ![](TECHAN~1/unnamed-chunk-10-1.png)<!-- -->
 
-From the boxplots, it does appear that each boxplot is a little bit symmetrical in distribution by looking at the box part with q1, median, and q3, but it does appear that it may be a bit skewed since we have many outlying values. We can also clearly see that `few` has the highest maximum.
+From the boxplots, it does appear that each boxplot is a little bit symmetrical in distribution by looking at the box part with q1, median, and q3, but it does appear that it may be a bit skewed since we have many outlying values. We can also clearly see that `some` had the highest maximum and it having roughly the highest median.
 
 Finally, we’ll explore the title polarity vs. the share category using a histogram.
 
@@ -219,7 +219,7 @@ g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Ti
 
 ![](TECHAN~1/unnamed-chunk-11-1.png)<!-- -->
 
-Based on the histograms, it does look like the histograms are a little symmetric (not exactly normal though) with most values of Title Polarity being close to zero. The share category that had the most frequency of being close to zero was `many`. So articles with title polarity close to zero and having shares that are more than 3800 will most likely be shared more often.
+Based on the histograms, it does look like the histograms are a little symmetric (not exactly normal though) with most values of Title Polarity being close to zero. The share category that had the most frequency of being close to zero was `many`. So articles with title polarity close to zero and having shares that are more than the third quartile will most likely be shared more often. Articles with title polarity close to zero and having shares less than the first quartile are also shared quite often.
 
 # Model fitting
 
