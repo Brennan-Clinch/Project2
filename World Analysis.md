@@ -98,23 +98,23 @@ it.
 
 ``` r
 trainData<- trainData %>% 
-  mutate(sharecategory = ifelse(shares < 1400, "few",
-                      ifelse(shares %in% 1400:3800, "some",
+  mutate(sharecategory = ifelse(shares <quantile(shares,0.25), "few",
+                      ifelse(shares %in% quantile(shares,0.25):quantile(shares,0.75), "some",
                              "many")))
-testData <- testData %>% mutate(sharecategory = ifelse(shares < 1400, "few",ifelse(shares %in% 1400:3800, "some",
+testData <- testData %>% mutate(sharecategory = ifelse(shares <quantile(shares,0.25), "few",ifelse(shares %in% quantile(shares,0.25):quantile(shares,0.75), "some",
                              "many")))
 knitr::kable(table(trainData$sharecategory), caption = paste0("contingency table for sharecategory"))
 ```
 
 | Var1 | Freq |
 |:-----|-----:|
-| few  | 5163 |
-| many | 1864 |
-| some | 3168 |
+| few  | 2548 |
+| many | 2483 |
+| some | 5164 |
 
 contingency table for sharecategory
 
-From the table, it appears that for the World channel, most shares were less than 1400 and the least were greater than 3800.
+From the table, it appears that for the World channel, most shares were between the first and third quartiles for the data and the least were greater than the third quartile.
 
 Let’s now create bar plots of the number of images based on the new
 variable which is the category of shares based on the number of them.
@@ -132,7 +132,7 @@ g+geom_bar(position="dodge")+
 ![](WORLDA~1/unnamed-chunk-6-1.png)<!-- -->
 
 
-Looking at the plots, it appears our data is extremely skewed with most of the number of images being equal to zero especially when share category was equal to 'few', so while most images were not a lot and were mostly zero, the less the shares the fewer the number of images for each article in the World channel.
+Looking at the plots, it appears our data is extremely skewed with most of the number of images being equal to zero especially when share category was equal to 'some', so while most images were not a lot and were mostly zero, the more average the shares the fewer the number of images for each article in the World channel.
 
 ``` r
 g<-ggplot(data=trainData,aes(x=num_videos, fill=sharecategory))
@@ -145,6 +145,8 @@ g+geom_bar(position="dodge")+
 ```
 
 ![](WORLDA~1/unnamed-chunk-7-1.png)<!-- -->
+
+Looking at the plots, it appears our data is once again extremely skewed with most of the number of videos being equal to zero especially when share category was equal to 'some', so while most videos were not a lot and were mostly zero, the more average the shares the fewer the number of videos for each article in the World channel.
 
 We can inspect the trend of number of images and videos and how it
 affects number of shares. If the tallest and most concentrated chunk of
@@ -188,9 +190,9 @@ knitr ::kable(wordSumm2, caption = "Mean and Standard deviation of average word 
 
 | sharecategory |     Mean | Standard Deviation |
 |:--------------|---------:|-------------------:|
-| few           | 4.577873 |           1.041948 |
-| many          | 4.335015 |           1.359268 |
-| some          | 4.458941 |           1.218670 |
+| few           | 4.591716 |           1.016596 |
+| many          | 4.350898 |           1.332609 |
+| some          | 4.519554 |           1.140747 |
 
 Mean and Standard deviation of average word length by share category
 
@@ -206,7 +208,7 @@ g1+geom_boxplot()+
 
 ![](WORLDA~1/unnamed-chunk-10-1.png)<!-- -->
 
-From the boxplots, it does appear that each boxplot is a little bit symmetrical in distribution by looking at the box part with q1, median, and q3, but it does appear that it may be a bit skewed since we have many outlying values. We can also clearly see that few had the biggest average word length since it has the highest mean and maximum.
+From the boxplots, it does appear that each boxplot is a little bit symmetrical in distribution by looking at the box part with q1, median, and q3, but it does appear that it may be a bit skewed since we have many outlying values. We can also clearly see that few had the biggest maximum and mean.
 
 Finally, we’ll explore the title polarity vs. the share category using a histogram.
 
@@ -222,7 +224,7 @@ g+geom_histogram(aes(fill=title_sentiment_polarity),position="dodge")+labs(x="Ti
 
 ![](WORLDA~1/unnamed-chunk-11-1.png)<!-- -->
 
-Based on the histograms, it does look like the histograms are a little symmetric (not exactly normal though) with most values of Title Polarity being close to zero. So articles with title polarity close to zero will most likely be shared more often.
+Based on the histograms, it does look like the histograms are a little symmetric (not exactly normal though) with most values of Title Polarity being close to zero and having share category of 'some`. So articles with title polarity close to zero and having shares between the first and third quartiles of the data will most likely be shared more often.
 
 # Model fitting
 
